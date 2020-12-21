@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<title>TechOlympics: Code Golf!</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<script defer src="https://unpkg.com/marked@1.2.7/marked.min.js"></script>
+<script defer src="https://unpkg.com/dompurify@2/dist/purify.min.js"></script>
+<script defer type="module" src="./golf.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/hack@0.8.1/dist/hack.css" />
+<link rel="stylesheet" href="https://unpkg.com/hack@0.8.1/dist/dark.css" />
+<link rel="stylesheet" href="./main.css" />
+
+<!-- CSS Switcher -->
+<!--  https://github.com/dohliam/dropin-minimal-css -->
+<!-- <script
+  src="https://dohliam.github.io/dropin-minimal-css/switcher.js"
+  type="text/javascript"
+  defer
+></script> -->
+
+<!-- adding "hack" class makes it markdown style -->
+<body class="dark" style="font-size: 14px">
+  <div id="app">
+    <div v-if="!theHtmlDescription">Loading description...</div>
+
+    <div v-else v-cloak>
+      <div v-if="theHtmlDescription" v-html="theHtmlDescription"></div>
+
+      <div style="position: absolute; top: 1rem; right: 1rem">
+        <button @click="refreshDescription" style="font-size: 14px">
+          Refresh description
+        </button>
+      </div>
+
+      <div class="submission">
+        (Please use your actual name, and keep your name the same between
+        rounds.)
+        <form @submit.prevent="submit">
+          <label>
+            Name:
+            <input v-model="name" required />
+          </label>
+          <label>
+            Tio.Run Link:
+            <input v-model="text" required />
+          </label>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+
+      <golfer-submissions-table :submitted-forms="submittedForms"></golfer-table>
+    </div>
+  </div>
+</body>

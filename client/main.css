@@ -1,0 +1,70 @@
+* {
+  box-sizing: border-box;
+}
+
+[v-cloak] {
+  display: none;
+}
+
+html {
+  margin: 1rem 2rem;
+}
+
+.submission {
+  border: 1px solid white;
+  padding: 1.5rem;
+}
+.submission label,
+.submission button {
+  display: block;
+  margin-top: 1rem;
+}
+.submission input {
+  display: block;
+  margin-top: 0.3rem;
+  width: 100%;
+  font-size: 18px;
+}
+
+table thead th {
+  font-size: 1em;
+}
+
+form button {
+  opacity: 0.8;
+  margin-top: 1rem;
+  font-size: 1.1em;
+  display: inline-block;
+  color: #fff;
+  background: #0b0ff3;
+  border: 0;
+  padding: 0.8em;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 4px;
+  font-weight: bolder;
+}
+
+.inner-table {
+  margin: 0;
+}
+
+.inner-table td {
+  padding: 3px;
+}
+
+pre,
+code {
+  margin: 0;
+  padding: 0;
+}
+
+.small {
+  font-size: 0.7em;
+  line-height: normal;
+}
+
+.full-results-view-cell {
+  padding: 1rem 10rem;
+  border: none;
+}
