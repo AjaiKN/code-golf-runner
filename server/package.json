@@ -6,6 +6,7 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "fastify": "^3.9.2",
+    "fluent-json-schema": "^2.0.1",
     "mongodb": "^3.6.3",
     "nanoid": "^3.1.20",
     "nodemon": "^2.0.6",

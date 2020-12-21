@@ -9,7 +9,31 @@ const server = fastify({
   },
 })
 
-const { MongoClient, ObjectId } = require('mongodb')
+const S = require('fluent-json-schema').default
+
+const resultType = S.anyOf([
+  S.null(),
+  S.object()
+    .prop('lang', S.string().required())
+    .prop('code', S.string().required())
+    .prop(
+      'inputsOutputs',
+      S.array()
+        .items(
+          S.object()
+            .prop('input', S.string().required())
+            .prop('output', S.string().required())
+            .prop('debug', S.string().required()),
+        )
+        .required(),
+    )
+    .prop('header', S.anyOf([S.null(), S.string()]).required())
+    .prop('footer', S.anyOf([S.null(), S.string()]).required())
+    .prop('commandLineOptions', S.array().items(S.string()).required())
+    .prop('commandLineArguments', S.array().items(S.string()).required()),
+])
+
+const { MongoClient } = require('mongodb')
 
 const { nanoid } = require('nanoid/async')
 
@@ -23,14 +47,9 @@ server.post(
   '/submission',
   {
     schema: {
-      body: {
-        type: 'object',
-        properties: {
-          name: { type: 'string' },
-          submission: { type: 'string' },
-        },
-        required: ['name', 'submission'],
-      },
+      body: S.object()
+        .prop('name', S.string().required())
+        .prop('submission', S.string().required()),
     },
   },
   async (/** @type any */ req) => {
@@ -57,34 +76,21 @@ server.get(
   '/admininfo',
   {
     schema: {
-      querystring: {
-        type: 'object',
-        properties: {
-          password: { type: 'string' },
-        },
-        required: ['password'],
-      },
+      querystring: S.object().prop('password', S.string().required()),
       response: {
-        200: {
-          type: 'object',
-          properties: {
-            submissions: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  _id: { type: 'string' },
-                  name: { type: 'string' },
-                  submission: { type: 'string' },
-                  result: {},
-                  timestamp: { type: 'string' },
-                },
-                required: ['_id', 'name', 'submission', 'timestamp'],
-              },
-            },
-          },
-          required: ['submissions'],
-        },
+        200: S.object().prop(
+          'submissions',
+          S.array()
+            .items(
+              S.object()
+                .prop('_id', S.string().required())
+                .prop('name', S.string().required())
+                .prop('submission', S.string().required())
+                .prop('result', resultType)
+                .prop('timestamp', S.string().required()),
+            )
+            .required(),
+        ),
       },
     },
   },
@@ -104,15 +110,10 @@ server.post(
   '/testresult',
   {
     schema: {
-      body: {
-        type: 'object',
-        properties: {
-          _id: { type: 'string' },
-          result: {},
-          password: { type: 'string' },
-        },
-        required: ['_id', 'result', 'password'],
-      },
+      body: S.object()
+        .prop('_id', S.string())
+        .prop('result', resultType)
+        .prop('password', S.string()),
     },
   },
   async (/** @type any */ req, reply) => {
@@ -130,32 +131,18 @@ server.get(
   '/testsneeded',
   {
     schema: {
-      querystring: {
-        type: 'object',
-        properties: {
-          password: { type: 'string' },
-        },
-        required: ['password'],
-      },
+      querystring: S.object().prop('password', S.string().required()),
       response: {
-        200: {
-          type: 'object',
-          properties: {
-            submissions: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  _id: { type: 'string' },
-                  submission: { type: 'string' },
-                },
-                required: ['_id', 'submission'],
-              },
-            },
-            inputs: { type: 'array', items: { type: 'string' } },
-          },
-          required: ['submissions', 'inputs'],
-        },
+        200: S.object().prop(
+          'submissions',
+          S.array()
+            .items(
+              S.object()
+                .prop('_id', S.string().required())
+                .prop('submission', S.string().required()),
+            )
+            .required(),
+        ),
       },
     },
   },
@@ -176,22 +163,11 @@ server.get(
   '/golferinfo',
   {
     schema: {
-      querystring: {
-        type: 'object',
-        properties: {
-          // separated by +s
-          ids: { type: 'string' },
-        },
-      },
+      querystring: S.object().prop('ids', S.string().required()),
       response: {
-        200: {
-          type: 'object',
-          properties: {
-            introduction: { type: 'string' },
-            submissions: {},
-          },
-          required: ['introduction', 'submissions'],
-        },
+        200: S.object()
+          .prop('introduction', S.string().required())
+          .prop('submissions', resultType),
       },
     },
   },
