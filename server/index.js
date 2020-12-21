@@ -2,7 +2,11 @@
 
 const fastify = require('fastify').default
 const server = fastify({
-  logger: { prettyPrint: process.env.NODE_ENV !== 'production' },
+  logger: {
+    prettyPrint: process.env.NODE_ENV !== 'production',
+    // @ts-ignore
+    redact: ['name'],
+  },
 })
 
 const { MongoClient, ObjectId } = require('mongodb')
