@@ -9,6 +9,7 @@ import { nanoid } from 'https://cdn.skypack.dev/pin/nanoid@v3.1.20-dsnQAVooO9Dnk
 import { get, post } from './get-post.js'
 import { throttle } from './throttle.js'
 import { GolferSubmissionsTable } from './view-submission.js'
+import { useLocalStorageRef } from './use-local-storage-ref.js'
 
 function getMarkdownHtml(markdownStr) {
   const html = marked(markdownStr)
@@ -29,7 +30,7 @@ createApp({
   setup() {
     const name = ref('')
     const text = ref('')
-    const submittedForms = ref([])
+    const submittedForms = useLocalStorageRef('submittedForms', [])
     const ids = computed(() =>
       submittedForms.value.map(({ _id }) => _id).filter((_id) => _id),
     )
@@ -76,8 +77,6 @@ createApp({
     }, 500)
     refreshDescription()
     setInterval(refreshDescription, 5000)
-
-    watchEffect(() => console.log(submittedForms.value))
 
     return {
       theHtmlDescription: computed(
