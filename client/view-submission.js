@@ -28,20 +28,24 @@ const getHumanTime = (timestamp) => new Date(timestamp).toLocaleTimeString()
 
 export const FullView = {
   name: 'full-view',
-  props: { submission: Object },
+  props: {
+    submission: Object,
+    isAdmin: { type: Boolean, default: false },
+  },
   components: { DebugInfo },
   setup() {
     return { getHumanTime }
   },
   template: /* HTML */ `
-    <p>{{getHumanTime(submission.timestamp)}}, {{submission.name}}</p>
-    <p>
+    <p v-if="isAdmin">
       <a :href="submission.submission">{{submission.submission}}</a>
     </p>
     <template v-if="submission.result">
-      <p>{{submission.result.lang}}</p>
-      <br />
-      <pre><code>{{submission.result.code}}</code></pre>
+      <p v-if="!isAdmin">{{submission.result.lang}}</p>
+      <pre
+        v-if="!isAdmin"
+        style="margin-bottom: 2rem"
+      ><code>{{submission.result.code}}</code></pre>
       <table class="inner-table">
         <thead>
           <th>In</th>
@@ -132,7 +136,7 @@ const SubmissionView = {
     <row-view :submission="submission" @click="showFullView = !showFullView" />
     <tr v-if="showFullView">
       <td colspan="4" class="full-results-view-cell">
-        <full-view :submission="submission" />
+        <full-view :is-admin="true" :submission="submission" />
       </td>
     </tr>
   `,
@@ -147,7 +151,7 @@ export const SubmissionsTable = {
       <thead>
         <th>Time</th>
         <th>Name</th>
-        <th>Submission</th>
+        <th>Language</th>
         <th>Code</th>
       </thead>
       <tbody>
@@ -168,6 +172,9 @@ export const GolferSubmissionsTable = {
   name: 'golfer-submissions-table',
   props: { submittedForms: Array },
   components: { FullView },
+  setup() {
+    return { getHumanTime }
+  },
   template: /* HTML */ `
     <table>
       <thead>
@@ -188,7 +195,7 @@ export const GolferSubmissionsTable = {
                 Submitting...
               </span>
               <span style="color: green" v-else-if="form.submittedSuccessfully">
-                Submitted successfully at {{form.timestamp}}
+                Submitted successfully at {{getHumanTime(form.timestamp)}}
               </span>
               <span style="color: red" v-else-if="!form.submittedSuccessfully">
                 Submission failed. Please try again.
