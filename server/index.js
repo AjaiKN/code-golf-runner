@@ -11,29 +11,27 @@ const server = fastify({
 
 const S = require('fluent-json-schema').default
 
-server.addSchema(
-  S.id('result').anyOf([
-    S.null(),
-    S.object()
-      .prop('lang', S.string().required())
-      .prop('code', S.string().required())
-      .prop(
-        'inputsOutputs',
-        S.array()
-          .items(
-            S.object()
-              .prop('input', S.string().required())
-              .prop('output', S.string().required())
-              .prop('debug', S.string().required()),
-          )
-          .required(),
-      )
-      .prop('header', S.anyOf([S.null(), S.string()]).required())
-      .prop('footer', S.anyOf([S.null(), S.string()]).required())
-      .prop('commandLineOptions', S.array().items(S.string()).required())
-      .prop('commandLineArguments', S.array().items(S.string()).required()),
-  ]),
-)
+const resultType = S.anyOf([
+  S.null(),
+  S.object()
+    .prop('lang', S.string().required())
+    .prop('code', S.string().required())
+    .prop(
+      'inputsOutputs',
+      S.array()
+        .items(
+          S.object()
+            .prop('input', S.string().required())
+            .prop('output', S.string().required())
+            .prop('debug', S.string().required()),
+        )
+        .required(),
+    )
+    .prop('header', S.anyOf([S.null(), S.string()]).required())
+    .prop('footer', S.anyOf([S.null(), S.string()]).required())
+    .prop('commandLineOptions', S.array().items(S.string()).required())
+    .prop('commandLineArguments', S.array().items(S.string()).required()),
+])
 
 const { MongoClient } = require('mongodb')
 
@@ -88,7 +86,7 @@ server.get(
                 .prop('_id', S.string().required())
                 .prop('name', S.string().required())
                 .prop('submission', S.string().required())
-                .prop('result', S.ref('result#'))
+                .prop('result', resultType)
                 .prop('timestamp', S.string().required()),
             )
             .required(),
@@ -114,7 +112,7 @@ server.post(
     schema: {
       body: S.object()
         .prop('_id', S.string())
-        .prop('result', S.ref('result#'))
+        .prop('result', resultType)
         .prop('password', S.string()),
     },
   },
@@ -169,7 +167,7 @@ server.get(
       response: {
         200: S.object()
           .prop('introduction', S.string().required())
-          .prop('submissions', S.ref('result#')),
+          .prop('submissions', resultType),
       },
     },
   },
