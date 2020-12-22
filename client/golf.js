@@ -28,7 +28,7 @@ function getMarkdownHtml(markdownStr) {
 createApp({
   components: { GolferSubmissionsTable },
   setup() {
-    const name = ref('')
+    const name = useLocalStorageRef('name', '')
     const text = ref('')
     const submittedForms = useLocalStorageRef('submittedForms', [])
     const ids = computed(() =>
