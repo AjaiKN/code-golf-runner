@@ -33,6 +33,13 @@ const resultType = S.anyOf([
     .prop('commandLineArguments', S.array().items(S.string()).required()),
 ])
 
+const submissionType = S.object()
+  .prop('_id', S.string().required())
+  .prop('name', S.string().required())
+  .prop('submission', S.string().required())
+  .prop('result', resultType)
+  .prop('timestamp', S.string().required())
+
 const { MongoClient } = require('mongodb')
 
 const { nanoid } = require('nanoid/async')
@@ -80,16 +87,7 @@ server.get(
       response: {
         200: S.object().prop(
           'submissions',
-          S.array()
-            .items(
-              S.object()
-                .prop('_id', S.string().required())
-                .prop('name', S.string().required())
-                .prop('submission', S.string().required())
-                .prop('result', resultType)
-                .prop('timestamp', S.string().required()),
-            )
-            .required(),
+          S.array().items(submissionType).required(),
         ),
       },
     },
@@ -167,7 +165,7 @@ server.get(
       response: {
         200: S.object()
           .prop('introduction', S.string().required())
-          .prop('submissions', resultType),
+          .prop('submissions', S.array().items(submissionType).required()),
       },
     },
   },
