@@ -46,6 +46,9 @@ const { nanoid } = require('nanoid/async')
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
+
+  // @ts-ignore
+  server.register(require('fastify-cors'))
 }
 /** @type {MongoClient} */
 let mongo
