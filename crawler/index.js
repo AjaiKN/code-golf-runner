@@ -1,6 +1,8 @@
 // @ts-check
 
+const _ = require('lodash')
 const { Builder, By, until } = require('selenium-webdriver')
+const chrome = require('selenium-webdriver/chrome')
 
 const WAIT_TIME = 10000
 
@@ -18,7 +20,12 @@ async function getStuff(
     if (!url.startsWith('https://tio.run/')) return null
   }
 
-  const driver = await new Builder().forBrowser('safari').build()
+  const driver = await new Builder()
+    .forBrowser('chrome')
+    .setChromeOptions(
+      new chrome.Options().headless().windowSize({ width: 640, height: 480 }),
+    )
+    .build()
   try {
     await driver.get(url)
 
@@ -104,44 +111,91 @@ async function getStuff(
   return ret
 }
 
-// ;(async () => {
-//   console.log(
-//     await getStuff(
-//       // 'https://tio.run/##KypNqvz/v6C0pFgjPbWkWK8kPz5TQVvBUPP/f@P/ef/yC0oy8/OK/6f9LwIA',
-//       'https://tio.run/dfsajkdsa',
-//       ['5\n', '6\n', '7\n'],
-//     ),
-//   )
-// })()
-
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
-const axios = require('axios').default
-axios.defaults.baseURL = process.env.SERVER_URL
+;(async () => {
+  console.log(
+    await getStuff(
+      'https://tio.run/##KypNqvz/v6C0pFgjPbWkWK8kPz5TQVvBUPP/f@P/ef/yC0oy8/OK/6f9LwIA',
+      // 'https://tio.run/dfsajkdsa',
+      ['5\n', '6\n', '7\n'],
+    ),
+  )
+})()
 
-const password = process.env.PASSWORD
+const WebSocket = require('ws')
 
-async function checkForAndRunSubmissions() {
-  /** @type {{submissions: {_id: string, submission: string}[], inputs: string[]}} */
-  const { submissions, inputs } = (
-    await axios.get('/testsneeded', { params: { password } })
-  ).data
-  console.log(`testing ids: ` + submissions.map((s) => s._id))
-  const promises = submissions.map(async ({ _id, submission }) => {
-    const result = await getStuff(submission, inputs)
-    console.log({ _id, result })
-    await axios.post('/testresult', {
-      _id,
-      result,
-      password,
-    })
-    console.log('done posting')
-  })
-  await Promise.all(promises)
+/** @type {WebSocket} */
+let socket
+
+const disconnected = _.throttle(() => {
+  console.log('disconnected')
   setTimeout(() => {
-    checkForAndRunSubmissions()
+    if (socket.readyState !== WebSocket.OPEN) {
+      console.log('attempting to reconnect')
+      socket.close()
+      connectWebsocket()
+    }
   }, 2000)
+}, 2000)
+
+function connectWebsocket() {
+  socket = new WebSocket(process.env.SERVER_URL + '/crawler', {
+    headers: { password: process.env.PASSWORD },
+  })
+
+  let submissions = []
+
+  socket.on('open', () => {
+    console.log('socket open')
+  })
+
+  socket.on('close', disconnected)
+  socket.on('error', disconnected)
+
+  const inputs = ['5\n', '6\n', '7\n']
+
+  socket.on('message', (dataUnparsed) => {
+    const data = JSON.parse(dataUnparsed.toString())
+    if (data.type === 'update') {
+      const allSubmissions = data.submissions
+
+      const newSubmissions = allSubmissions.filter(
+        (s) => !submissions.find((s2) => s2._id === s._id),
+      )
+      console.log(`testing ids: ` + newSubmissions.map((s) => s._id))
+      newSubmissions.forEach(async ({ _id, submission }) => {
+        const result = await getStuff(submission, inputs)
+        console.log({ _id, result })
+        socket.send(JSON.stringify({ type: 'testresult', _id, result }))
+      })
+
+      submissions = allSubmissions
+    }
+  })
 }
-checkForAndRunSubmissions()
+connectWebsocket()
+// async function checkForAndRunSubmissions() {
+//   /** @type {{submissions: {_id: string, submission: string}[], inputs: string[]}} */
+//   const { submissions, inputs } = (
+//     await axios.get('/testsneeded', { params: { password } })
+//   ).data
+//   console.log(`testing ids: ` + submissions.map((s) => s._id))
+//   const promises = submissions.map(async ({ _id, submission }) => {
+//     const result = await getStuff(submission, inputs)
+//     console.log({ _id, result })
+//     await axios.post('/testresult', {
+//       _id,
+//       result,
+//       password,
+//     })
+//     console.log('done posting')
+//   })
+//   await Promise.all(promises)
+//   setTimeout(() => {
+//     checkForAndRunSubmissions()
+//   }, 2000)
+// }
+// checkForAndRunSubmissions()

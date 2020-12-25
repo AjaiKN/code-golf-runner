@@ -6,14 +6,68 @@ import {
   watchEffect,
 } from 'https://unpkg.com/vue@3.0.4/dist/vue.esm-browser.js'
 import { nanoid } from 'https://cdn.skypack.dev/pin/nanoid@v3.1.20-dsnQAVooO9DnkpQkIpbq/min/nanoid.js'
-import { get, post } from './get-post.js'
+import { get, post, useWebsocket } from './get-post.js'
 import { throttle } from './throttle.js'
-import { GolferSubmissionsTable } from './view-submission.js'
+import { GolferSubmissionsTable, ShowConnectivity } from './view-submission.js'
 import { useLocalStorageRef } from './use-local-storage-ref.js'
 
 function getMarkdownHtml(markdownStr) {
   const html = marked(markdownStr)
   return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } })
+}
+
+const LoginForm = {
+  name: 'login-form',
+  props: {
+    name: String,
+    secretPhrase: String,
+    showSecretPhraseInput: Boolean,
+    isSubmittingForm: Boolean,
+  },
+  emits: ['submit', 'update:showSecretPhraseInput'],
+  setup(props, { emit }) {
+    const myName = ref(props.name)
+    const mySecretPhrase = ref(props.secretPhrase)
+
+    function submit() {
+      emit('submit', { name: myName.value, secretPhrase: mySecretPhrase.value })
+    }
+
+    return { myName, mySecretPhrase, submit }
+  },
+  template: /* HTML */ `
+    <div class="login">
+      Please use your actual name. You won't be able to change it later.
+      <form @submit.prevent="submit">
+        <div>
+          <label for="name">Name:</label>
+          <input
+            id="name"
+            name="name"
+            :readonly="isSubmittingForm || showSecretPhraseInput"
+            v-model="myName"
+          />
+          <button
+            v-if="showSecretPhraseInput"
+            class="edit-button"
+            :disabled="isSubmittingForm"
+            type="button"
+            @click="$emit('update:showSecretPhraseInput', false)"
+          >
+            Log into different name
+          </button>
+        </div>
+        <div>
+          <label v-if="showSecretPhraseInput">
+            Secret Phrase:
+            <input :readonly="isSubmittingForm" v-model="mySecretPhrase" />
+          </label>
+        </div>
+        <button class="submit-button">Log in</button>
+      </form>
+      <p v-if="isSubmittingForm">Submitting form...</p>
+    </div>
+  `,
 }
 
 // function actuallySubmitForm(form) {
@@ -26,14 +80,17 @@ function getMarkdownHtml(markdownStr) {
 // }
 
 createApp({
-  components: { GolferSubmissionsTable },
+  components: { GolferSubmissionsTable, LoginForm, ShowConnectivity },
   setup() {
-    const name = useLocalStorageRef('name', '')
+    const auth = useLocalStorageRef('auth', { name: '', secretPhrase: '' })
+
+    // {type: 'loading'}
+    // {type: 'login', showSecretPhraseInput: false, isSubmittingForm: boolean}
+    // {type: 'login', showSecretPhraseInput: true, isSubmittingForm: boolean}
+    // {type: 'authenticated'}
+    const authStatus = ref({ type: 'loading' })
+
     const text = ref('')
-    const submittedForms = useLocalStorageRef('submittedForms', [])
-    const ids = computed(() =>
-      submittedForms.value.map(({ _id }) => _id).filter((_id) => _id),
-    )
 
     function submit() {
       if (
@@ -46,37 +103,58 @@ createApp({
       }
       const formToSubmit = reactive({
         id: nanoid(),
-        name: name.value.trim(),
         text: text.value,
       })
       text.value = ''
-      submittedForms.value.unshift(formToSubmit)
       post('/submission', {
-        name: formToSubmit.name,
+        ...auth.value,
         submission: formToSubmit.text,
       })
-        .then(({ timestamp, _id }) => {
-          formToSubmit.timestamp = timestamp.toString()
-          formToSubmit._id = _id
-          formToSubmit.submittedSuccessfully = true
-        })
-        .catch((err) => {
-          console.error(err)
-          formToSubmit.submittedSuccessfully = false
-        })
     }
 
     const markdownDescription = ref(null)
-    const refreshDescription = throttle(async () => {
-      const res = await get('/golferinfo?ids=' + ids.value.join('+'))
-      markdownDescription.value = res.introduction
-      for (const submission of res.submissions) {
-        const s = submittedForms.value.find((f) => f._id === submission._id)
-        s.fullSubmissionInfo = submission
-      }
-    }, 500)
-    refreshDescription()
-    setInterval(refreshDescription, 5000)
+
+    const submittedForms = ref()
+
+    const { send, isConnected } = useWebsocket('/golfer', {
+      onConnect: () => {
+        send({ type: 'auth', ...auth.value })
+      },
+      onMessage: {
+        'update:globals'({ globals }) {
+          markdownDescription.value = globals.introduction
+        },
+        'update:submissions'({ submissions }) {
+          submittedForms.value = submissions.reverse()
+        },
+        authenticated(authInfo) {
+          authStatus.value.isSubmittingForm = false
+          auth.value = authInfo
+          authStatus.value = { type: 'authenticated' }
+        },
+        needLogin() {
+          authStatus.value.isSubmittingForm = false
+          authStatus.value = { type: 'login', showSecretPhraseInput: false }
+        },
+        needSecretPhrase() {
+          authStatus.value.isSubmittingForm = false
+          if (
+            authStatus.value.type === 'login' &&
+            authStatus.value.showSecretPhraseInput
+          ) {
+            alert('incorrect name or phrase')
+          }
+          authStatus.value = { type: 'login', showSecretPhraseInput: true }
+        },
+      },
+    })
+
+    function submitLogin(login) {
+      console.log({ submitting: true, login })
+      auth.value = login
+      authStatus.value.isSubmittingForm = true
+      send({ type: 'auth', ...auth.value })
+    }
 
     return {
       theHtmlDescription: computed(
@@ -85,10 +163,24 @@ createApp({
           getMarkdownHtml(markdownDescription.value),
       ),
       submit,
-      name,
       text,
       submittedForms,
-      refreshDescription,
+      auth,
+      authStatus,
+      submitLogin,
+      isConnected,
+      logOut: () => {
+        if (
+          window.confirm(
+            `Are you sure you want to log out? Make sure to write down your secret phrase first: ${auth?.value?.secretPhrase}.`,
+          )
+        ) {
+          auth.value = { name: '', secretPhrase: '' }
+          send({ type: 'auth', ...auth.value })
+          authStatus.value.isSubmittingForm = false
+          authStatus.value = { type: 'login', showSecretPhraseInput: false }
+        }
+      },
     }
   },
 }).mount('#app')

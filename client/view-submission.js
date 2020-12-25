@@ -1,3 +1,8 @@
+import {
+  ref,
+  watchEffect,
+} from 'https://unpkg.com/vue@3.0.4/dist/vue.esm-browser.js'
+
 const DebugInfo = {
   name: 'debug-info',
   props: { str: String },
@@ -37,7 +42,8 @@ export const FullView = {
     return { getHumanTime }
   },
   template: /* HTML */ `
-    <p v-if="isAdmin">
+    <p v-if="!isAdmin">{{getHumanTime(submission.timestamp)}}</p>
+    <p>
       <a :href="submission.submission">{{submission.submission}}</a>
     </p>
     <template v-if="submission.result">
@@ -46,7 +52,7 @@ export const FullView = {
         v-if="!isAdmin"
         style="margin-bottom: 2rem"
       ><code>{{submission.result.code}}</code></pre>
-      <table class="inner-table">
+      <table v-if="submission.result.inputsOutputs" class="inner-table">
         <thead>
           <th>In</th>
           <th>Out</th>
@@ -176,39 +182,47 @@ export const GolferSubmissionsTable = {
     return { getHumanTime }
   },
   template: /* HTML */ `
-    <table>
-      <thead>
-        <th>Name</th>
-        <th>Submission</th>
-        <th>Submission Status</th>
-      </thead>
-      <tbody>
-        <tr v-if="submittedForms.length === 0">
-          <td colspan="3">You haven't submitted anything yet</td>
-        </tr>
-        <template v-for="form in submittedForms" :key="form.id">
-          <tr>
-            <td>{{form.name}}</td>
-            <td><a :href="form.text">{{form.text}}</a></td>
-            <td>
-              <span v-if="form.submittedSuccessfully == null">
-                Submitting...
-              </span>
-              <span style="color: green" v-else-if="form.submittedSuccessfully">
-                Submitted successfully at {{getHumanTime(form.timestamp)}}
-              </span>
-              <span style="color: red" v-else-if="!form.submittedSuccessfully">
-                Submission failed. Please try again.
-              </span>
-            </td>
-          </tr>
-          <tr v-if="form.fullSubmissionInfo">
-            <td colspan="3" class="full-results-view-cell">
-              <full-view :submission="form.fullSubmissionInfo"></full-view>
-            </td>
-          </tr>
-        </template>
-      </tbody>
-    </table>
+    <div style="margin-top: 2rem">
+      <h2>Previous Submissions</h2>
+      <p v-if="submittedForms.length === 0">Nothing submitted yet</p>
+      <div style="padding: 0 1rem">
+        <div
+          style="border: 0.5px solid white; margin-top: 1rem; padding: 2rem"
+          v-for="form in submittedForms"
+        >
+          <full-view :submission="form" />
+        </div>
+      </div>
+    </div>
+  `,
+}
+
+export const ShowConnectivity = {
+  name: 'show-connectivity',
+  setup(props) {
+    let numDots = ref(0)
+    function updateNumDots() {
+      numDots.value = (numDots.value + 1) % 4
+    }
+    let intervalId
+    watchEffect(() => {
+      if (!props.isConnected) {
+        intervalId = setInterval(updateNumDots, 400)
+      } else if (intervalId) {
+        clearInterval(intervalId)
+      }
+    })
+    return { numDots }
+  },
+  props: { isConnected: Boolean },
+  template: /* HTML */ `
+    <teleport to="#top-right">
+      <span style="color: green" v-if="isConnected">Connected to server</span>
+      <span style="color: red" v-else>
+        Not connected to server :(
+        <br />
+        Attempting to connect{{'.'.repeat(numDots)}}
+      </span>
+    </teleport>
   `,
 }

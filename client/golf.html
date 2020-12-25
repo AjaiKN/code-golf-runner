@@ -12,37 +12,43 @@
 <link rel="stylesheet" href="https://unpkg.com/hack@0.8.1/dist/dark.css" />
 <link rel="stylesheet" href="./main.css" />
 
-<!-- CSS Switcher -->
-<!--  https://github.com/dohliam/dropin-minimal-css -->
-<!-- <script
-  src="https://dohliam.github.io/dropin-minimal-css/switcher.js"
-  type="text/javascript"
-  defer
-></script> -->
-
 <!-- adding "hack" class makes it markdown style -->
 <body class="dark" style="font-size: 14px">
-  <div id="app">
-    <div v-if="!theHtmlDescription">Loading description...</div>
+  <div id="top-right" style="position: absolute; top: 1rem; right: 1rem"></div>
 
-    <div v-else v-cloak>
+  <div id="app">
+    <show-connectivity :is-connected="isConnected"></show-connectivity>
+
+    <div v-if="authStatus.type === 'loading'">Loading description...</div>
+
+    <div v-cloak v-else-if="authStatus.type === 'login'">
+      <login-form
+        :name="auth.name"
+        :secret-phrase="auth.secretPhrase"
+        v-model:show-secret-phrase-input="authStatus.showSecretPhraseInput"
+        :is-submitting-form="authStatus.isSubmittingForm"
+        @submit="submitLogin($event)"
+      ></login-form>
+    </div>
+
+    <div v-else-if="theHtmlDescription && submittedForms" v-cloak>
+      <teleport to="#top-right">
+        <div style="text-align: right">
+          <button @click="logOut">Log out</button>
+        </div>
+      </teleport>
+
+      <h1>Welcome to TechOlympics Code Golf, {{auth.name}}!</h1>
+
+      <!-- prettier-ignore -->
+      <p>
+        Your secret phrase is <b>{{auth.secretPhrase}}</b>. Write it down!
+      </p>
+
       <div v-if="theHtmlDescription" v-html="theHtmlDescription"></div>
 
-      <div style="position: absolute; top: 1rem; right: 1rem">
-        <button @click="refreshDescription" style="font-size: 14px">
-          Refresh description
-        </button>
-      </div>
-
       <div class="submission">
-        Please use your actual name, and keep your name the same. You may submit
-        the form more than once for the same question, and only your most recent
-        response for that question will count.
         <form @submit.prevent="submit">
-          <label>
-            Name:
-            <input v-model="name" required />
-          </label>
           <label>
             Tio.Run Link:
             <input v-model="text" required />
@@ -52,6 +58,7 @@
       </div>
 
       <golfer-submissions-table
+        v-if="submittedForms"
         :submitted-forms="submittedForms"
       ></golfer-submissions-table>
     </div>

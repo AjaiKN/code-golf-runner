@@ -13,7 +13,11 @@
 <link rel="stylesheet" href="./main.css" />
 
 <body class="dark" style="font-size: 14px">
+  <div id="top-right" style="position: absolute; top: 1rem; right: 1rem"></div>
+
   <div id="app">
+    <show-connectivity :is-connected="isConnected"></show-connectivity>
+
     <pre v-cloak v-if="error">{{error}}</pre>
 
     <p v-else-if="!adminInfo">Loading...</p>

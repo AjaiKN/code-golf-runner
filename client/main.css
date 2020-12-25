@@ -26,6 +26,32 @@ html {
   font-size: 18px;
 }
 
+.login {
+  padding: 1.5rem 1rem;
+  padding: 0.5em;
+}
+.login label,
+.login .submit-button {
+  display: block;
+  margin-top: 1rem;
+}
+.login input {
+  display: block;
+  margin-top: 0.3rem;
+  width: 100%;
+  font-size: 18px;
+}
+
+input:read-only,
+button:disabled {
+  background-color: gray;
+  cursor: default;
+}
+
+.edit-button {
+  font-size: 1rem;
+}
+
 table thead th {
   font-size: 1em;
 }
@@ -67,4 +93,8 @@ code {
 .full-results-view-cell {
   padding: 1rem 10rem;
   border: none;
+}
+
+#app {
+  margin-top: 5rem;
 }

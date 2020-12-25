@@ -4,27 +4,24 @@ import {
   computed,
 } from 'https://unpkg.com/vue@3.0.4/dist/vue.esm-browser.js'
 // import { exampleSubmission } from './example-submission.js'
-import { get } from './get-post.js'
-import { SubmissionsTable } from './view-submission.js'
+import { useWebsocket } from './get-post.js'
+import { SubmissionsTable, ShowConnectivity } from './view-submission.js'
 
 const app = createApp({
-  components: { SubmissionsTable },
+  components: { SubmissionsTable, ShowConnectivity },
   setup() {
-    const password = window.location.hash.substring(1)
-
     const error = ref()
 
     const adminInfo = ref()
 
-    const getAdminInfo = () =>
-      get(`/admininfo?password=${password}`)
-        .then((s) => {
-          error.value = undefined
-          adminInfo.value = s
-        })
-        .catch((e) => (error.value = e.message))
-    getAdminInfo()
-    setInterval(getAdminInfo, 2000)
+    const { isConnected, send } = useWebsocket('/admin', {
+      onConnect: () => {
+        send({ type: 'auth', password: window.location.hash.substring(1) })
+      },
+      onMessage: {
+        update: (message) => (adminInfo.value = message),
+      },
+    })
 
     return {
       adminInfo,
@@ -34,6 +31,7 @@ const app = createApp({
         console.log(a)
         return a
       },
+      isConnected,
     }
   },
 })
