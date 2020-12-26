@@ -1,25 +1,27 @@
-import { ref } from 'https://unpkg.com/vue@3.0.4/dist/vue.esm-browser.js'
-import { throttle } from './throttle.js'
+import { ref } from 'vue'
+import { throttle } from 'lodash-es'
 
-// Set this to true when developing on local machine
-const IS_DEVELOPMENT = ['localhost', '127.0.0.1', ''].includes(
-  window.location.hostname,
-)
+const SERVER_URL =
+  process.env.NODE_ENV !== 'production'
+    ? 'http://localhost:3000'
+    : 'http://localhost:3000'
 
-const SERVER_URL = IS_DEVELOPMENT ? 'http://localhost:3000' : ''
-
-function resolvePath(path) {
+function resolvePath(path: string) {
   if (path.startsWith('/')) path = SERVER_URL + path
   return path
 }
 
-async function getOrPost(isPost, /** @type {string} */ path, body) {
+async function getOrPost(
+  isPost: boolean,
+  /** @type {string} */ path: string,
+  body?: any,
+) {
   path = resolvePath(path)
   const res = await fetch(path, {
     method: isPost ? 'POST' : 'GET',
     headers: {
       Accept: 'application/json',
-      'Content-Type': isPost ? 'application/json' : undefined,
+      'Content-Type': isPost ? 'application/json' : (undefined as any),
     },
     body: body && JSON.stringify(body),
   })
@@ -34,24 +36,33 @@ async function getOrPost(isPost, /** @type {string} */ path, body) {
   return res.json()
 }
 
-export function get(path) {
+export function get(path: string) {
   return getOrPost(false, path)
 }
 
-export function post(path, body) {
+export function post(path: string, body: any) {
   return getOrPost(true, path, body)
 }
 
-export function useWebsocket(path, { onConnect, onMessage, send }) {
+export function useWebsocket(
+  path: string,
+  {
+    onConnect,
+    onMessage,
+  }: {
+    onConnect?: () => void
+    onMessage?: Record<string, (message: any) => void>
+  },
+) {
   path = resolvePath(path).replace('http', 'ws')
 
   const isConnected = ref(false)
 
   let timeout = 100
-  /** @type WebSocket */
-  let ws
 
-  function send(message) {
+  let ws: WebSocket
+
+  function send(message: { type: string } & Record<string, any>) {
     ws.send(JSON.stringify(message))
   }
 
