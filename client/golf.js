@@ -42,6 +42,7 @@ const LoginForm = {
         <div>
           <label for="name">Name:</label>
           <input
+            required
             id="name"
             name="name"
             :readonly="isSubmittingForm || showSecretPhraseInput"
@@ -60,7 +61,11 @@ const LoginForm = {
         <div>
           <label v-if="showSecretPhraseInput">
             Secret Phrase:
-            <input :readonly="isSubmittingForm" v-model="mySecretPhrase" />
+            <input
+              required
+              :readonly="isSubmittingForm"
+              v-model="mySecretPhrase"
+            />
           </label>
         </div>
         <button class="submit-button">Log in</button>
