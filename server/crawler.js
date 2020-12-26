@@ -1,4 +1,5 @@
 const { ObjectId } = require('mongodb')
+const { limitRate } = require('./auth-rate-limit')
 
 /** @type {import('fastify').FastifyPluginAsync<{}>} */
 module.exports = async function crawler(server) {
@@ -9,7 +10,9 @@ module.exports = async function crawler(server) {
   const pipeline = [{ $match: query }, { $project: projection }]
   const submissionsStream = submissions.watch(pipeline)
 
-  server.get('/crawler', { websocket: true }, (connection, req) => {
+  server.get('/crawler', { websocket: true }, async (connection, req) => {
+    await limitRate()
+
     // authenticate
     console.log('crawler connected')
     if (req.headers.password !== process.env.PASSWORD) {

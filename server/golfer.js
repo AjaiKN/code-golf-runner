@@ -1,8 +1,6 @@
 const S = require('fluent-json-schema').default
-
-async function genSecretPhrase() {
-  return 'the-secret-phrase'
-}
+const { genSecretPhrase } = require('./diceware.js')
+const { limitRate } = require('./auth-rate-limit.js')
 
 function pick(object, properties) {
   const ret = {}
@@ -105,6 +103,9 @@ module.exports = async function golfer(server) {
           send({ type: 'needLogin' })
           return
         }
+
+        await limitRate()
+
         let golfer = await golfers.findOne({ _id: message.name })
         if (golfer) {
           if (golfer.secretPhrase === message.secretPhrase) {

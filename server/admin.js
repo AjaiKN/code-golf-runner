@@ -1,3 +1,5 @@
+const { limitRate } = require('./auth-rate-limit')
+
 /** @type {import('fastify').FastifyPluginAsync<{}>} */
 module.exports = async function admin(server) {
   const submissions = server.mongo.db.collection('submissions')
@@ -19,10 +21,11 @@ module.exports = async function admin(server) {
       }
     }
 
-    connection.socket.on('message', (messageUnparsed) => {
+    connection.socket.on('message', async (messageUnparsed) => {
       console.log(messageUnparsed)
       const message = JSON.parse(messageUnparsed)
       if (message.type === 'auth') {
+        await limitRate()
         if (message.password === process.env.PASSWORD) {
           isAuthenticated = true
           sendData()
