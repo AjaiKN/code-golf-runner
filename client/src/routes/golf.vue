@@ -13,83 +13,54 @@
     ></login-form>
   </div>
 
-  <div v-else-if="theHtmlDescription && submittedForms">
-    <teleport to="#top-right">
-      <div style="text-align: right">
-        <button @click="logOut">Log out</button>
-      </div>
-    </teleport>
-
-    <h1>Welcome to TechOlympics Code Golf, {{ auth.name }}!</h1>
-
-    <!-- prettier-ignore -->
-    <p>
-        Your secret phrase is <b>{{auth.secretPhrase}}</b>. Write it down!
-      </p>
-
-    <div v-if="theHtmlDescription" v-html="theHtmlDescription"></div>
-
-    <div class="submission">
-      <form @submit.prevent="submit">
-        <label>
-          Tio.Run Link:
-          <input v-model="text" required />
-        </label>
-        <button type="submit">Submit</button>
-      </form>
-    </div>
-
-    <golfer-submissions-table
-      v-if="submittedForms"
+  <div v-else-if="markdownDescription && submittedForms">
+    <golf-main
+      :auth="auth"
+      :markdown-description="markdownDescription"
       :submitted-forms="submittedForms"
-    ></golfer-submissions-table>
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, Ref, ref, watchEffect } from 'vue'
-import { nanoid } from 'nanoid'
-import { post, useWebsocket } from '../http'
-import GolferSubmissionsTable from '../components/GolferSubmissionsTable.vue'
+import { defineAsyncComponent, defineComponent, h, ref, watchEffect } from 'vue'
+import { useWebsocket } from '../http'
 import LoginForm from '../components/LoginForm.vue'
 import ShowConnectivity from '../components/ShowConnectivity.vue'
 import { useLocalStorageRef } from '../useLocalStorageRef'
-import { getMarkdownHtml } from '../getMarkdownHtml'
 
 type AuthStatus =
   | { type: 'loading' }
   | { type: 'login'; showSecretPhraseInput: boolean; isSubmittingForm: boolean }
   | { type: 'authenticated' }
 
+const GolfMainComponentPromise = import('../components/GolfMain.vue')
+
 export default defineComponent({
-  components: { GolferSubmissionsTable, LoginForm, ShowConnectivity },
+  components: {
+    LoginForm,
+    ShowConnectivity,
+    GolfMain: defineAsyncComponent({
+      loader: () => GolfMainComponentPromise,
+      loadingComponent: () => h('p', 'Loading...'),
+      errorComponent: () =>
+        h('p', 'There was an error fetching the GolfMain component'),
+      timeout: 4000,
+      onError(error, retry, fail, attempts) {
+        if (error.message.match(/fetch/) && attempts <= 3) {
+          // retry on fetch errors, 3 max attempts
+          retry()
+        } else {
+          fail()
+        }
+      },
+    }),
+  },
   setup() {
     const auth = useLocalStorageRef('auth', { name: '', secretPhrase: '' })
 
     const authStatus = ref<AuthStatus>({ type: 'loading' })
     watchEffect(() => console.log(JSON.stringify(authStatus.value)))
-
-    const text = ref('')
-
-    function submit() {
-      if (
-        !/^(https?:\/\/)?(tryitonline\.net|tio\.run)\//.test(text.value) &&
-        !window.confirm(
-          "This doesn't look like a tio.run link. Are you sure you want to submit it?",
-        )
-      ) {
-        return
-      }
-      const formToSubmit = reactive({
-        id: nanoid(),
-        text: text.value,
-      })
-      text.value = ''
-      post('/submission', {
-        ...auth.value,
-        submission: formToSubmit.text,
-      })
-    }
 
     const markdownDescription = ref(null)
 
@@ -147,36 +118,32 @@ export default defineComponent({
       send({ type: 'auth', ...auth.value })
     }
 
+    function logOut() {
+      if (
+        window.confirm(
+          `Are you sure you want to log out? Make sure to write down your secret phrase first: ${auth?.value?.secretPhrase}.`,
+        )
+      ) {
+        auth.value = { name: '', secretPhrase: '' }
+        send({ type: 'auth', ...auth.value })
+        if (authStatus.value.type === 'login')
+          authStatus.value.isSubmittingForm = false
+        authStatus.value = {
+          type: 'login',
+          showSecretPhraseInput: false,
+          isSubmittingForm: false,
+        }
+      }
+    }
+
     return {
-      theHtmlDescription: computed(
-        () =>
-          markdownDescription.value &&
-          getMarkdownHtml(markdownDescription.value!),
-      ),
-      submit,
-      text,
+      markdownDescription,
       submittedForms,
       auth,
       authStatus,
       submitLogin,
       isConnected,
-      logOut: () => {
-        if (
-          window.confirm(
-            `Are you sure you want to log out? Make sure to write down your secret phrase first: ${auth?.value?.secretPhrase}.`,
-          )
-        ) {
-          auth.value = { name: '', secretPhrase: '' }
-          send({ type: 'auth', ...auth.value })
-          if (authStatus.value.type === 'login')
-            authStatus.value.isSubmittingForm = false
-          authStatus.value = {
-            type: 'login',
-            showSecretPhraseInput: false,
-            isSubmittingForm: false,
-          }
-        }
-      },
+      logOut,
     }
   },
 })
