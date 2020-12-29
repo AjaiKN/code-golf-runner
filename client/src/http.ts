@@ -96,11 +96,11 @@ export function useWebsocket(
   connectWebsocket()
 
   setTimeout(() => {
-    console.log('failed to connect')
     if (!isConnected.value) {
+      console.log('failed to connect after 4s')
       disconnected()
     }
-  }, 2000)
+  }, 4000)
 
   return { isConnected, send }
 }
