@@ -10,23 +10,23 @@
       <tr v-if="submissions.length === 0">
         <td :colspan="3">No submissions yet</td>
       </tr>
-      <submission-view
+      <SubmissionAdminOpenableRow
         v-for="submission in submissions"
         :key="submission._id"
         :submission="submission"
-      ></submission-view>
+      />
     </tbody>
   </table>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import SubmissionView from './SubmissionView.vue'
+import SubmissionAdminOpenableRow from './SubmissionAdminOpenableRow.vue'
 
 export default defineComponent({
+  components: { SubmissionAdminOpenableRow },
   props: {
     submissions: { type: Array as PropType<any[]>, required: true },
   },
-  components: { SubmissionView },
 })
 </script>

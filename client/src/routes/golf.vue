@@ -1,32 +1,32 @@
 <template>
-  <show-connectivity :is-connected="isConnected"></show-connectivity>
+  <ShowConnectivity :isConnected="isConnected" />
 
   <div v-if="authStatus.type === 'loading'">Loading description...</div>
 
   <div v-else-if="authStatus.type === 'login'">
-    <login-form
+    <GolfLoginForm
       :name="auth.name"
       :secret-phrase="auth.secretPhrase"
       v-model:show-secret-phrase-input="authStatus.showSecretPhraseInput"
       :is-submitting-form="authStatus.isSubmittingForm"
       @submit="submitLogin($event)"
-    ></login-form>
+    />
   </div>
 
   <div v-else-if="markdownDescription && submittedForms">
-    <golf-main
+    <GolfMain
       :auth="auth"
-      :markdown-description="markdownDescription"
-      :submitted-forms="submittedForms"
+      :markdownDescription="markdownDescription"
+      :submittedForms="submittedForms"
     />
   </div>
 </template>
 
 <script lang="ts">
 import { defineAsyncComponent, defineComponent, h, ref, watchEffect } from 'vue'
-import { useWebsocket } from '../http'
-import LoginForm from '../components/LoginForm.vue'
+import GolfLoginForm from '../components/GolfLoginForm.vue'
 import ShowConnectivity from '../components/ShowConnectivity.vue'
+import { useWebsocket } from '../http'
 import { useLocalStorageRef } from '../useLocalStorageRef'
 
 type AuthStatus =
@@ -38,8 +38,6 @@ const GolfMainComponentPromise = import('../components/GolfMain.vue')
 
 export default defineComponent({
   components: {
-    LoginForm,
-    ShowConnectivity,
     GolfMain: defineAsyncComponent({
       loader: () => GolfMainComponentPromise,
       loadingComponent: () => h('p', 'Loading...'),
@@ -55,6 +53,8 @@ export default defineComponent({
         }
       },
     }),
+    ShowConnectivity,
+    GolfLoginForm,
   },
   setup() {
     const auth = useLocalStorageRef('auth', { name: '', secretPhrase: '' })
@@ -62,7 +62,7 @@ export default defineComponent({
     const authStatus = ref<AuthStatus>({ type: 'loading' })
     watchEffect(() => console.log(JSON.stringify(authStatus.value)))
 
-    const markdownDescription = ref(null)
+    const markdownDescription = ref<string>()
 
     const submittedForms = ref()
 

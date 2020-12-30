@@ -63,7 +63,6 @@
 </template>
 
 <script lang="ts">
-import DebugInfo from './DebugInfo.vue'
 import { getHumanTime } from '../getHumanTime'
 import { defineComponent } from 'vue'
 
@@ -72,7 +71,6 @@ export default defineComponent({
     submission: { type: Object, required: true },
     isAdmin: { type: Boolean, default: false },
   },
-  components: { DebugInfo },
   setup() {
     return { getHumanTime }
   },

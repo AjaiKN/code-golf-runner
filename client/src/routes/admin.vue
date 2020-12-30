@@ -1,5 +1,5 @@
 <template>
-  <show-connectivity :is-connected="isConnected"></show-connectivity>
+  <ShowConnectivity :is-connected="isConnected" />
 
   <pre v-if="error">{{ error }}</pre>
 
@@ -8,18 +8,21 @@
   <div v-else>
     <h1>Code Golf Results</h1>
 
-    <submissions-table :submissions="submissions"></submissions-table>
+    <SubmissionAdmin :submissions="submissions" />
   </div>
 </template>
 
 <script>
 import { computed, defineComponent, ref } from 'vue'
-import { useWebsocket } from '../http'
-import SubmissionsTable from '../components/SubmissionsTable.vue'
 import ShowConnectivity from '../components/ShowConnectivity.vue'
+import SubmissionAdmin from '../components/SubmissionAdmin.vue'
+import { useWebsocket } from '../http'
 
 export default defineComponent({
-  components: { SubmissionsTable, ShowConnectivity },
+  components: {
+    SubmissionAdmin,
+    ShowConnectivity,
+  },
   setup() {
     const error = ref()
 

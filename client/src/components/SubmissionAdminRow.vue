@@ -20,11 +20,9 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { getHumanTime } from '../getHumanTime'
-import DebugInfo from './DebugInfo.vue'
 
 export default defineComponent({
   props: { submission: { type: Object, required: true } },
-  components: { DebugInfo },
   setup() {
     return { getHumanTime }
   },

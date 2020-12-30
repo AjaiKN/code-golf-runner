@@ -12,7 +12,7 @@
     Your secret phrase is <b>{{auth.secretPhrase}}</b>. Write it down!
   </p>
 
-  <render-markdown :markdown="markdownDescription" />
+  <RenderMarkdown :markdown="markdownDescription" />
 
   <div class="submission">
     <form @submit.prevent="submit">
@@ -24,24 +24,21 @@
     </form>
   </div>
 
-  <golfer-submissions-table
-    v-if="submittedForms"
-    :submitted-forms="submittedForms"
-  ></golfer-submissions-table>
+  <SubmissionGolf v-if="submittedForms" :submitted-forms="submittedForms" />
 </template>
 
 <script lang="ts">
 import { nanoid } from 'nanoid'
 import { defineComponent, reactive, ref } from 'vue'
 import { post } from '../http'
-import GolferSubmissionsTable from './GolferSubmissionsTable.vue'
 import RenderMarkdown from './RenderMarkdown.vue'
+import SubmissionGolf from './SubmissionGolf.vue'
 
 export default defineComponent({
-  components: { GolferSubmissionsTable, RenderMarkdown },
+  components: { RenderMarkdown, SubmissionGolf },
   props: {
     auth: { type: Object, required: true },
-    markdownDescription: { type: String, required: true },
+    markdownDescription: { type: String, required: false },
     submittedForms: { type: Array, required: true },
   },
   emits: ['log-out'],

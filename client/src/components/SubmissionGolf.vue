@@ -8,20 +8,20 @@
         v-for="form in submittedForms"
         :key="form._id"
       >
-        <full-view :submission="form" />
+        <SubmissionFullView :submission="form" />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import FullView from './FullView.vue'
 import { getHumanTime } from '../getHumanTime'
 import { defineComponent, PropType } from 'vue'
+import SubmissionFullView from './SubmissionFullView.vue'
 
 export default defineComponent({
+  components: { SubmissionFullView },
   props: { submittedForms: { type: Array as PropType<any[]>, required: true } },
-  components: { FullView },
   setup() {
     return { getHumanTime }
   },
