@@ -24,7 +24,7 @@
             <pre><code>{{c.output}}</code></pre>
           </td>
           <td>
-            <debug-info :str="c.debug"></debug-info>
+            <DebugInfo :str="c.debug" />
           </td>
         </tr>
       </tbody>
@@ -65,8 +65,10 @@
 <script lang="ts">
 import { getHumanTime } from '../getHumanTime'
 import { defineComponent } from 'vue'
+import DebugInfo from './DebugInfo.vue'
 
 export default defineComponent({
+  components: { DebugInfo },
   props: {
     submission: { type: Object, required: true },
     isAdmin: { type: Boolean, default: false },
