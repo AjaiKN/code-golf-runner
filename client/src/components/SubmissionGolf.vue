@@ -1,6 +1,6 @@
 <template>
   <div style="margin-top: 2rem">
-    <h2>Previous Submissions</h2>
+    <h2>Your Previous Submissions</h2>
     <p v-if="submittedForms.length === 0">Nothing submitted yet</p>
     <div style="padding: 0 1rem">
       <div
