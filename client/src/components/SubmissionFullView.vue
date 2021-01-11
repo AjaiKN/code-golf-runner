@@ -1,5 +1,12 @@
 <template>
-  <p v-if="!isAdmin">{{ getHumanTime(submission.timestamp) }}</p>
+  <p v-if="!isAdmin">Question {{ submission.questionNum }}</p>
+  <p>
+    <Correctness :correctness="submission.correctness" :showReason="true" />
+  </p>
+  <p>
+    {{ getHumanTime(submission.timestamp) }}
+    <span v-if="submission.isLate" style="color: red">(Late)</span>
+  </p>
   <p>
     <a :href="submission.submission">{{ submission.submission }}</a>
   </p>
@@ -9,26 +16,10 @@
       v-if="!isAdmin"
       style="margin-bottom: 2rem"
     ><code>{{submission.result.code}}</code></pre>
-    <table v-if="submission.result.inputsOutputs" class="inner-table">
-      <thead>
-        <th>In</th>
-        <th>Out</th>
-        <th>Debug</th>
-      </thead>
-      <tbody>
-        <tr v-for="c in submission.result.inputsOutputs">
-          <td>
-            <pre><code>{{c.input}}</code></pre>
-          </td>
-          <td>
-            <pre><code>{{c.output}}</code></pre>
-          </td>
-          <td>
-            <DebugInfo :str="c.debug" />
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <InputsAndOutputs
+      v-if="submission.result.inputsOutputs"
+      :inputsOutputs="submission.result.inputsOutputs"
+    />
     <template v-if="submission.result.header">
       Header:
       <pre><code>{{submission.result.header}}</code></pre>
@@ -40,6 +31,7 @@
     <template v-if="submission.result.commandLineOptions.length > 0">
       Command Line Options:
       <ul>
+        <!-- eslint-disable-next-line vue/require-v-for-key -->
         <li v-for="a in submission.result.commandLineOptions">
           <pre><code>{{a}}</code></pre>
         </li>
@@ -48,6 +40,7 @@
     <template v-if="submission.result.commandLineArguments.length > 0">
       Command Line Arguments:
       <ul>
+        <!-- eslint-disable-next-line vue/require-v-for-key -->
         <li v-for="a in submission.result.commandLineArguments">
           <pre><code>{{a}}</code></pre>
         </li>
@@ -64,13 +57,18 @@
 
 <script lang="ts">
 import { getHumanTime } from '../getHumanTime'
-import { defineComponent } from 'vue'
-import DebugInfo from './DebugInfo.vue'
+import { defineComponent, PropType } from 'vue'
+import InputsAndOutputs from './InputsAndOutputs.vue'
+import { Submission } from '../../../server/types'
+import Correctness from './Correctness.vue'
 
 export default defineComponent({
-  components: { DebugInfo },
+  components: { InputsAndOutputs, Correctness },
   props: {
-    submission: { type: Object, required: true },
+    submission: {
+      type: Object as PropType<Submission>,
+      required: true,
+    },
     isAdmin: { type: Boolean, default: false },
   },
   setup() {

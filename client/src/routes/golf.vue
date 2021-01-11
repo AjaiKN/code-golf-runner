@@ -13,17 +13,26 @@
     />
   </div>
 
-  <div v-else-if="markdownDescription && submittedForms">
+  <div v-else-if="globals && submittedForms">
     <GolfMain
-      :auth="auth"
-      :markdownDescription="markdownDescription"
+      :globals="globals"
       :submittedForms="submittedForms"
+      @logOut="logOut"
     />
   </div>
 </template>
 
 <script lang="ts">
-import { defineAsyncComponent, defineComponent, h, ref, watchEffect } from 'vue'
+import {
+  computed,
+  defineAsyncComponent,
+  defineComponent,
+  h,
+  provide,
+  ref,
+  watchEffect,
+} from 'vue'
+import type { Globals, Submission } from '../../../server/types'
 import GolfLoginForm from '../components/GolfLoginForm.vue'
 import ShowConnectivity from '../components/ShowConnectivity.vue'
 import { useWebsocket } from '../http'
@@ -58,21 +67,22 @@ export default defineComponent({
   },
   setup() {
     const auth = useLocalStorageRef('auth', { name: '', secretPhrase: '' })
+    provide('auth', auth)
 
     const authStatus = ref<AuthStatus>({ type: 'loading' })
     watchEffect(() => console.log(JSON.stringify(authStatus.value)))
 
-    const markdownDescription = ref<string>()
+    const globals = ref<Globals>()
 
-    const submittedForms = ref()
+    const submittedForms = ref<Submission[]>()
 
     const { send, isConnected } = useWebsocket('/golfer', {
       onConnect: () => {
         send({ type: 'auth', ...auth.value })
       },
       onMessage: {
-        'update:globals'({ globals }) {
-          markdownDescription.value = globals.introduction
+        'update:globals'(message) {
+          globals.value = message.globals
         },
         'update:submissions'({ submissions }) {
           submittedForms.value = submissions.reverse()
@@ -137,7 +147,7 @@ export default defineComponent({
     }
 
     return {
-      markdownDescription,
+      globals,
       submittedForms,
       auth,
       authStatus,

@@ -20,6 +20,8 @@ server.register(require('fastify-mongodb'), {
   url: process.env.MONGO_URI,
 })
 
+server.register(require('./mongo-watchers'))
+
 server.register(require('./admin'))
 server.register(require('./golfer'))
 server.register(require('./crawler'))

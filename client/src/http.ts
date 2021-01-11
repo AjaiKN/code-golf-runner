@@ -63,10 +63,11 @@ export function useWebsocket(
   let ws: WebSocket
 
   function send(message: { type: string } & Record<string, any>) {
-    ws.send(JSON.stringify(message))
+    if (ws.readyState === 1) ws.send(JSON.stringify(message))
+    else console.error('cannot send message; websocket not open')
   }
 
-  const disconnected = throttle(() => {
+  const disconnected = () => {
     isConnected.value = false
     console.log('trying to reconnect... ' + timeout)
     setTimeout(() => {
@@ -76,7 +77,8 @@ export function useWebsocket(
         if (timeout < 2000) timeout += 200
       }
     }, timeout)
-  }, 100)
+  }
+
   function connectWebsocket() {
     ws = new WebSocket(path)
     ws.addEventListener('open', () => {
@@ -91,7 +93,7 @@ export function useWebsocket(
       if (onMessage && onMessage[type]) onMessage[type](message)
     })
     ws.addEventListener('close', disconnected)
-    ws.addEventListener('error', disconnected)
+    // ws.addEventListener('error', disconnected)
   }
   connectWebsocket()
 

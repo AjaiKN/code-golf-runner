@@ -4,7 +4,7 @@
     @click="showFullView = !showFullView"
   />
   <tr v-if="showFullView">
-    <td :colspan="4" class="full-results-view-cell">
+    <td :colspan="100" class="full-results-view-cell">
       <SubmissionFullView :isAdmin="true" :submission="submission" />
     </td>
   </tr>

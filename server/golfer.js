@@ -1,14 +1,7 @@
 const S = require('fluent-json-schema').default
 const { genSecretPhrase } = require('./diceware.js')
 const { limitRate } = require('./auth-rate-limit.js')
-
-function pick(object, properties) {
-  const ret = {}
-  for (const p of properties) {
-    ret[p] = object[p]
-  }
-  return ret
-}
+const { censorGlobals, annotateAndCensorSubmissions } = require('./questions')
 
 /** @type {import('fastify').FastifyPluginAsync<{}>} */
 module.exports = async function golfer(server) {
@@ -16,73 +9,52 @@ module.exports = async function golfer(server) {
   const globals = server.mongo.db.collection('globals')
   const submissions = server.mongo.db.collection('submissions')
 
-  const submissionsStream = submissions.watch(undefined, {
-    fullDocument: 'updateLookup',
-  })
-
-  const globalsStream = globals.watch()
-
   server.get('/golfer', { websocket: true }, (connection, req) => {
     /** @type {null | {name: string}} */
     let authentication = null
 
-    function send(message) {
+    function send(/** @type {{type: string} & Record<string, any>} */ message) {
       connection.socket.send(JSON.stringify(message))
     }
 
-    async function sendGlobals() {
-      if (authentication) {
-        send({
-          type: 'update:globals',
-          globals: await globals.findOne({ _id: 'globals' }),
-        })
-      }
-    }
-
-    async function sendSubmissions(changeEvent) {
+    async function sendSubmissions(changeEvent, theGlobals) {
       if (authentication) {
         if (
-          changeEvent &&
+          changeEvent?.fullDocument &&
           changeEvent.fullDocument.name !== authentication.name
         ) {
           return
         }
-        const theSubmissions = (
-          await submissions.find({ name: authentication.name }).toArray()
-        ).map((submission) => {
-          // TODO
-          const isQuestionStillInProgress = false
-          if (isQuestionStillInProgress) {
-            if (submission.result)
-              submission.result = pick(submission.result, [
-                'lang',
-                'code',
-                'header',
-                'footer',
-                'commandLineOptions',
-                'commandLineArguments',
-              ])
-            return pick(submission, [
-              '_id',
-              'name',
-              'submission',
-              'timestamp',
-              'result',
-            ])
-          } else {
-            return submission
-          }
-        })
+
+        const [theActualGlobals, theSubmissions] = await Promise.all([
+          theGlobals ?? globals.findOne({}),
+          submissions.find({ name: authentication.name }).toArray(),
+        ])
+
+        const processedSubmissions = annotateAndCensorSubmissions(
+          theSubmissions,
+          theActualGlobals,
+          authentication.name,
+        )
+
         send({
           type: 'update:submissions',
-          submissions: theSubmissions,
+          submissions: processedSubmissions,
         })
       }
     }
 
-    function sendAllData() {
-      sendGlobals()
-      sendSubmissions()
+    async function sendGlobals(changeEvent) {
+      if (authentication) {
+        console.log('updating globals!')
+        const theGlobals =
+          changeEvent?.fullDocument ?? (await globals.findOne({}))
+        send({
+          type: 'update:globals',
+          globals: censorGlobals(theGlobals),
+        })
+        sendSubmissions(undefined, theGlobals)
+      }
     }
 
     function authenticatedSuccessfully(golfer) {
@@ -92,7 +64,7 @@ module.exports = async function golfer(server) {
         name: golfer._id,
         secretPhrase: golfer.secretPhrase,
       })
-      sendAllData()
+      sendGlobals()
     }
 
     connection.socket.on('message', async (messageUnparsed) => {
@@ -122,12 +94,12 @@ module.exports = async function golfer(server) {
       }
     })
 
-    submissionsStream.on('change', sendSubmissions)
-    globalsStream.on('change', sendGlobals)
+    server.mongoWatchers.submissions.on('change', sendSubmissions)
+    server.mongoWatchers.globals.on('change', sendGlobals)
 
     connection.socket.on('close', () => {
-      submissionsStream.off('change', sendSubmissions)
-      globalsStream.off('change', sendGlobals)
+      server.mongoWatchers.submissions.off('change', sendSubmissions)
+      server.mongoWatchers.globals.off('change', sendGlobals)
     })
   })
 
@@ -143,6 +115,14 @@ module.exports = async function golfer(server) {
     },
     async (/** @type any */ req) => {
       const timestamp = new Date()
+      const { body } = req
+
+      const person = await server.mongo.db
+        .collection('golfers')
+        .findOne({ _id: body.name, secretPhrase: body.secretPhrase })
+      if (!person) return
+      delete body.secretPhrase
+
       await submissions.insertOne({ ...req.body, timestamp })
       return {}
     },

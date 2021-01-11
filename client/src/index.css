@@ -10,22 +10,6 @@ html {
   margin: 1rem 2rem;
 }
 
-.submission {
-  border: 1px solid white;
-  padding: 1.5rem;
-}
-.submission label,
-.submission button {
-  display: block;
-  margin-top: 1rem;
-}
-.submission input {
-  display: block;
-  margin-top: 0.3rem;
-  width: 100%;
-  font-size: 18px;
-}
-
 .login {
   padding: 1.5rem 1rem;
   padding: 0.5em;

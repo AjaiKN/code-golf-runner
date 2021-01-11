@@ -1,14 +1,15 @@
 <template>
   <table style="font-size: 15px">
     <thead>
-      <th>Time</th>
+      <th style="width: 1rem">Status</th>
+      <th style="width: 1rem">Chars</th>
       <th>Name</th>
       <th>Language</th>
       <th>Code</th>
     </thead>
     <tbody>
       <tr v-if="submissions.length === 0">
-        <td :colspan="3">No submissions yet</td>
+        <td :colspan="100">No submissions yet</td>
       </tr>
       <SubmissionAdminOpenableRow
         v-for="submission in submissions"

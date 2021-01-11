@@ -1,6 +1,11 @@
 <template>
   <tr>
-    <td>{{ getHumanTime(submission.timestamp) }}</td>
+    <td>
+      <div style="display: flex; justify-content: center">
+        <Correctness :correctness="submission.correctness" />
+      </div>
+    </td>
+    <td>{{ submission.result?.code?.length ?? '' }}</td>
     <td>{{ submission.name }}</td>
     <template v-if="submission.result">
       <td>{{ submission.result.lang }}</td>
@@ -12,16 +17,19 @@
       <td :colspan="2">Failed to run submission</td>
     </template>
     <template v-else>
-      <td :colspan="2">Evaluation submission...</td>
+      <td :colspan="2">Evaluating submission...</td>
     </template>
   </tr>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+
 import { getHumanTime } from '../getHumanTime'
+import Correctness from './Correctness.vue'
 
 export default defineComponent({
+  components: { Correctness },
   props: { submission: { type: Object, required: true } },
   setup() {
     return { getHumanTime }

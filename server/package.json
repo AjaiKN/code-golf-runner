@@ -1,14 +1,18 @@
 {
   "private": true,
   "scripts": {
-    "dev": "nodemon --unhandled-rejections=strict index.js"
+    "dev": "ts-node-dev --transpile-only index.js",
+    "build": "tsc --noEmit false",
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "dotenv": "^8.2.0",
     "fastify": "^3.9.2",
     "fastify-mongodb": "^2.0.1",
+    "fastify-plugin": "^3.0.0",
     "fastify-websocket": "^2.0.11",
     "fluent-json-schema": "^2.0.1",
+    "immer": "^8.0.0",
     "mitt": "^2.1.0",
     "mongodb": "^3.6.3",
     "nanoid": "^3.1.20",
@@ -18,6 +22,8 @@
   "devDependencies": {
     "@types/mongodb": "^3.6.3",
     "@types/node": "^14.14.14",
-    "fastify-cors": "^5.1.0"
+    "fastify-cors": "^5.1.0",
+    "ts-node-dev": "^1.1.1",
+    "typescript": "^4.1.3"
   }
 }

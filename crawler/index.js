@@ -115,15 +115,21 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
-;(async () => {
-  console.log(
-    await getStuff(
-      'https://tio.run/##KypNqvz/v6C0pFgjPbWkWK8kPz5TQVvBUPP/f@P/ef/yC0oy8/OK/6f9LwIA',
-      // 'https://tio.run/dfsajkdsa',
-      ['5\n', '6\n', '7\n'],
-    ),
-  )
-})()
+function sleep(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds))
+}
+
+let isRunningSelenium = false
+
+// ;(async () => {
+//   console.log(
+//     await getStuff(
+//       'https://tio.run/##KypNqvz/v6C0pFgjPbWkWK8kPz5TQVvBUPP/f@P/ef/yC0oy8/OK/6f9LwIA',
+//       // 'https://tio.run/dfsajkdsa',
+//       ['5\n', '6\n', '7\n'],
+//     ),
+//   )
+// })()
 
 const WebSocket = require('ws')
 
@@ -147,6 +153,7 @@ function connectWebsocket() {
   })
 
   let submissions = []
+  const submissionsTodo = () => submissions.filter((s) => !s.doneRunning)
 
   socket.on('open', () => {
     console.log('socket open')
@@ -155,47 +162,35 @@ function connectWebsocket() {
   socket.on('close', disconnected)
   socket.on('error', disconnected)
 
-  const inputs = ['5\n', '6\n', '7\n']
-
-  socket.on('message', (dataUnparsed) => {
+  socket.on('message', async (dataUnparsed) => {
     const data = JSON.parse(dataUnparsed.toString())
     if (data.type === 'update') {
-      const allSubmissions = data.submissions
+      const receivedSubmissions = data.submissions
+      console.log('received')
 
-      const newSubmissions = allSubmissions.filter(
-        (s) => !submissions.find((s2) => s2._id === s._id),
+      submissions = submissions.concat(
+        receivedSubmissions.filter(
+          (s) => !submissions.find((s2) => s2._id === s._id),
+        ),
       )
-      console.log(`testing ids: ` + newSubmissions.map((s) => s._id))
-      newSubmissions.forEach(async ({ _id, submission }) => {
+
+      if (isRunningSelenium) return
+
+      isRunningSelenium = true
+      while (submissionsTodo().length > 0) {
+        console.log('starting')
+        const currentSubmission = submissionsTodo()[0]
+        const { submission, inputs, _id } = currentSubmission
         const result = await getStuff(submission, inputs)
         console.log({ _id, result })
         socket.send(JSON.stringify({ type: 'testresult', _id, result }))
-      })
-
-      submissions = allSubmissions
+        console.log('ending')
+        currentSubmission.doneRunning = true
+        await sleep(100)
+      }
+      isRunningSelenium = false
+      console.log('done')
     }
   })
 }
 connectWebsocket()
-// async function checkForAndRunSubmissions() {
-//   /** @type {{submissions: {_id: string, submission: string}[], inputs: string[]}} */
-//   const { submissions, inputs } = (
-//     await axios.get('/testsneeded', { params: { password } })
-//   ).data
-//   console.log(`testing ids: ` + submissions.map((s) => s._id))
-//   const promises = submissions.map(async ({ _id, submission }) => {
-//     const result = await getStuff(submission, inputs)
-//     console.log({ _id, result })
-//     await axios.post('/testresult', {
-//       _id,
-//       result,
-//       password,
-//     })
-//     console.log('done posting')
-//   })
-//   await Promise.all(promises)
-//   setTimeout(() => {
-//     checkForAndRunSubmissions()
-//   }, 2000)
-// }
-// checkForAndRunSubmissions()

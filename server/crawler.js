@@ -1,14 +1,10 @@
 const { ObjectId } = require('mongodb')
 const { limitRate } = require('./auth-rate-limit')
+const { normalizeInput } = require('./questions')
 
 /** @type {import('fastify').FastifyPluginAsync<{}>} */
 module.exports = async function crawler(server) {
   const submissions = server.mongo.db.collection('submissions')
-
-  const query = { result: { $exists: false } }
-  const projection = { _id: true, submission: true }
-  const pipeline = [{ $match: query }, { $project: projection }]
-  const submissionsStream = submissions.watch(pipeline)
 
   server.get('/crawler', { websocket: true }, async (connection, req) => {
     await limitRate()
@@ -21,13 +17,28 @@ module.exports = async function crawler(server) {
     }
 
     async function sendData() {
+      console.log('sending data to crawler')
+      const [theGlobals, theSubmissions] = await Promise.all([
+        server.mongo.db.collection('globals').findOne({}),
+        submissions
+          .find({ result: { $exists: false } })
+          .project({ _id: true, submission: true, questionNum: true })
+          .toArray(),
+      ])
+
+      for (const submission of theSubmissions) {
+        const question = theGlobals.questions.find(
+          (q) => q.questionNum === submission.questionNum,
+        )
+        submission.inputs = question.inputsOutputs.map(({ input }) =>
+          normalizeInput(input),
+        )
+      }
+
       connection.socket.send(
         JSON.stringify({
           type: 'update',
-          submissions: await submissions
-            .find(query)
-            .project(projection)
-            .toArray(),
+          submissions: theSubmissions,
         }),
       )
     }
@@ -42,10 +53,10 @@ module.exports = async function crawler(server) {
       }
     })
 
-    submissionsStream.on('change', sendData)
+    server.mongoWatchers.submissions.on('change', sendData)
 
     connection.socket.on('close', () => {
-      submissionsStream.off('change', sendData)
+      server.mongoWatchers.submissions.off('change', sendData)
     })
   })
 }
