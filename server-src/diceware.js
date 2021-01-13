@@ -1,11 +1,10 @@
 // Note: crypto.random is only available in Node >=14.10
 
 const fs = require('fs/promises')
-const { getHeapSnapshot } = require('v8')
 const randomInt = require('util').promisify(require('crypto').randomInt)
 
 const wordsPromise = fs
-  .readFile('./eff_large_wordlist.txt', 'utf8')
+  .readFile('./server-src/eff_large_wordlist.txt', 'utf8')
   .then((str) => str.split('\n'))
 
 const PHRASE_LENGTH = 4

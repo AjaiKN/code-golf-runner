@@ -1,5 +1,9 @@
 {
   "private": true,
+  "engines": {
+    "yarn": "1.x",
+    "node": "15.x"
+  },
   "scripts": {
     "dev": "ts-node-dev --transpile-only index.js",
     "build": "tsc --noEmit false",
