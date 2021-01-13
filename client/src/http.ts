@@ -1,6 +1,9 @@
 import { ref } from 'vue'
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:3000'
+let SERVER_URL = (import.meta.env.VITE_SERVER_URL ??
+  'http://localhost:3000') as string
+// remove trailing slash
+SERVER_URL = SERVER_URL.replace(/\/$/, '')
 
 function resolvePath(path: string) {
   if (path.startsWith('/')) path = SERVER_URL + path
