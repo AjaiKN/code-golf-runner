@@ -1,10 +1,6 @@
 import { ref } from 'vue'
-import { throttle } from 'lodash-es'
 
-const SERVER_URL =
-  process.env.NODE_ENV !== 'production'
-    ? 'http://localhost:3000'
-    : 'http://localhost:3000'
+const SERVER_URL = process.env.VITE_SERVER_URL ?? 'http://localhost:3000'
 
 function resolvePath(path: string) {
   if (path.startsWith('/')) path = SERVER_URL + path
