@@ -22,6 +22,8 @@
 
     <SubmissionAdmin :submissions="filteredSubmissions" />
   </div>
+
+  <div style="height: 200vh" />
 </template>
 
 <script lang="ts">
