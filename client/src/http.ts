@@ -10,11 +10,7 @@ function resolvePath(path: string) {
   return path
 }
 
-async function getOrPost(
-  isPost: boolean,
-  /** @type {string} */ path: string,
-  body?: any,
-) {
+async function getOrPost(isPost: boolean, path: string, body?: any) {
   path = resolvePath(path)
   const res = await fetch(path, {
     method: isPost ? 'POST' : 'GET',
@@ -35,10 +31,21 @@ async function getOrPost(
   return res.json()
 }
 
+/**
+ * Perform a GET request
+ * @param path URL path
+ * @returns the JSON response
+ */
 export function get(path: string) {
   return getOrPost(false, path)
 }
 
+/**
+ * Perform a POST request
+ * @param path URL path
+ * @param body body of the request
+ * @returns the JSON response
+ */
 export function post(path: string, body: any) {
   return getOrPost(true, path, body)
 }

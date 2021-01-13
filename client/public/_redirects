@@ -1,1 +1,2 @@
+# Redirect all requests to index.html if they're not found (because the app is an SPA)
 /*   /index.html   200

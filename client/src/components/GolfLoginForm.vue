@@ -62,3 +62,27 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped>
+.login {
+  padding: 1.5rem 1rem;
+  padding: 0.5em;
+}
+
+label,
+.submit-button {
+  display: block;
+  margin-top: 1rem;
+}
+
+input {
+  display: block;
+  margin-top: 0.3rem;
+  width: 100%;
+  font-size: 18px;
+}
+
+.edit-button {
+  font-size: 1rem;
+}
+</style>

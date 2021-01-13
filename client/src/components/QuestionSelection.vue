@@ -1,4 +1,6 @@
 <template>
+  <!-- Buttons for selecting questions -->
+
   <div class="the-container">
     <button
       class="button"

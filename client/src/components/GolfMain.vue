@@ -38,28 +38,6 @@ export default defineComponent({
   setup(props) {
     const auth = inject('auth') as any
 
-    // const questions = [
-    //   {
-    //     questionNum: 3,
-    //     text:
-    //       'This is the **description** of question 3. Given a number in standard input, print out that number plus one. ~~This is crossed out.~~',
-    //     inputsOutputs: [
-    //       { input: '5', output: '6', isGivenExample: true },
-    //       { input: '6', output: '7', isGivenExample: true },
-    //       { input: '7', output: '8', isGivenExample: false },
-    //     ],
-    //   },
-    //   {
-    //     questionNum: 4,
-    //     text: 'This is the **description**.',
-    //     inputsOutputs: [
-    //       { input: '5', output: '6', isGivenExample: true },
-    //       { input: '6', output: '7', isGivenExample: true },
-    //       { input: '7', output: '8', isGivenExample: false },
-    //     ],
-    //   },
-    // ]
-
     return { auth }
   },
 })

@@ -1,4 +1,7 @@
 <template>
+  <!-- Grid of radio buttons at the top of the admin page for controlling 
+  whether each question hasn't started, is in progress, or is finished. -->
+
   <form @submit.prevent="() => {}">
     <table class="table">
       <thead>

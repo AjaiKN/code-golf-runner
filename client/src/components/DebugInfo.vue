@@ -1,4 +1,6 @@
 <template>
+  <!-- Displaying the debug info from tio.run output -->
+
   <pre><code :style="style">{{text.big}}<div class="small">{{text.small}}</div></code></pre>
 </template>
 
@@ -22,3 +24,10 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped>
+.small {
+  font-size: 0.7em;
+  line-height: normal;
+}
+</style>

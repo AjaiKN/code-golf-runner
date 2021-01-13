@@ -94,6 +94,7 @@ module.exports = async function golfer(server) {
       }
     })
 
+    // Whenever the submissions or globals change in MongoDB, send admins an update.
     server.mongoWatchers.submissions.on('change', sendSubmissions)
     server.mongoWatchers.globals.on('change', sendGlobals)
 
@@ -103,6 +104,7 @@ module.exports = async function golfer(server) {
     })
   })
 
+  // Accepting submissions (via POST request)
   server.post(
     '/submission',
     {

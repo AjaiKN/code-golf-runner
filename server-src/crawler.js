@@ -16,6 +16,7 @@ module.exports = async function crawler(server) {
       return
     }
 
+    /** Send all questions that don't have a result yet to the crawler */
     async function sendData() {
       console.log('sending data to crawler')
       const [theGlobals, theSubmissions] = await Promise.all([

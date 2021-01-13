@@ -10,4 +10,5 @@ async function mongoWatchers(server) {
   })
 }
 
+/** fastify plugin to watch MongoDB for changes */
 module.exports = require('fastify-plugin').default(mongoWatchers)

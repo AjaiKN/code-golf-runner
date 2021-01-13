@@ -1,4 +1,6 @@
 <template>
+  <!-- Displaying a submission as a table row on the admin page -->
+
   <tr>
     <td>
       <div style="display: flex; justify-content: center">

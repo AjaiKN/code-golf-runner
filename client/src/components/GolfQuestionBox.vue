@@ -1,5 +1,5 @@
 <template>
-  <p class="center bold" v-if="!currentQuestion">
+  <p v-if="!currentQuestion" class="center bold">
     Waiting for the competition to begin...
   </p>
 
@@ -65,6 +65,7 @@ export default defineComponent({
         props.questions.find((q) => q.questionNum === currentQuestionNum.value),
     )
 
+    // Only the input/output pairs that were given as examples
     const filteredInputsOutputs = computed(
       () =>
         currentQuestion.value?.inputsOutputs &&

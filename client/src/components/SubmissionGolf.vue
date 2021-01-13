@@ -1,4 +1,6 @@
 <template>
+  <!-- The "Your Previous Submissions" section on the golfer page -->
+
   <div style="margin-top: 2rem">
     <h2>Your Previous Submissions</h2>
     <p v-if="submittedForms.length === 0">Nothing submitted yet</p>

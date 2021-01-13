@@ -6,10 +6,15 @@ const chrome = require('selenium-webdriver/chrome')
 
 const WAIT_TIME = 10000
 
-async function getStuff(
-  /** @type {string} */ url,
-  /** @type {string[]} */ inputs,
-) {
+/**
+ * Testing a tio.run url
+ * @param {string} url tio.run url
+ * @param {string} inputs
+ * @returns null if unable to run the submission. Otherwise, a results object
+ * containing the results of running it against all the test cases, as well
+ * as the code itself, the programming language, etc.
+ */
+async function testTioRunCode(url, inputs) {
   let ret = null
 
   if (!url.startsWith('https://tio.run/')) {
@@ -121,16 +126,6 @@ function sleep(milliseconds) {
 
 let isRunningSelenium = false
 
-// ;(async () => {
-//   console.log(
-//     await getStuff(
-//       'https://tio.run/##KypNqvz/v6C0pFgjPbWkWK8kPz5TQVvBUPP/f@P/ef/yC0oy8/OK/6f9LwIA',
-//       // 'https://tio.run/dfsajkdsa',
-//       ['5\n', '6\n', '7\n'],
-//     ),
-//   )
-// })()
-
 const WebSocket = require('ws')
 
 /** @type {WebSocket} */
@@ -140,6 +135,7 @@ let SERVER_URL = process.env.SERVER_URL || 'http://localhost:3000'
 // remove trailing slash
 SERVER_URL = SERVER_URL.replace(/\/$/, '')
 
+/** When we're disconnected, try reconnecting every 2 seconds. */
 const disconnected = _.throttle(() => {
   console.log('disconnected')
   setTimeout(() => {
@@ -156,7 +152,9 @@ function connectWebsocket() {
     headers: { password: process.env.PASSWORD },
   })
 
+  /** All the submissions the crawler has received */
   let submissions = []
+  /**  */
   const submissionsTodo = () => submissions.filter((s) => !s.doneRunning)
 
   socket.on('open', () => {
@@ -172,12 +170,15 @@ function connectWebsocket() {
       const receivedSubmissions = data.submissions
       console.log('received')
 
+      // Add all the new submissions (that we don't know about yet)
+      // to the submissions array
       submissions = submissions.concat(
         receivedSubmissions.filter(
           (s) => !submissions.find((s2) => s2._id === s._id),
         ),
       )
 
+      // We only want to run 1 Selenium session at a time
       if (isRunningSelenium) return
 
       isRunningSelenium = true
@@ -185,7 +186,7 @@ function connectWebsocket() {
         console.log('starting')
         const currentSubmission = submissionsTodo()[0]
         const { submission, inputs, _id } = currentSubmission
-        const result = await getStuff(submission, inputs)
+        const result = await testTioRunCode(submission, inputs)
         console.log({ _id, result })
         socket.send(JSON.stringify({ type: 'testresult', _id, result }))
         console.log('ending')

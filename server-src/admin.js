@@ -9,30 +9,10 @@ module.exports = async function admin(server) {
   server.get('/admin', { websocket: true }, (connection, _req) => {
     let isAuthenticated
 
+    // Send message over websocket
     function send(/** @type {{type: string} & Record<string, any>} */ message) {
       connection.socket.send(JSON.stringify(message))
     }
-
-    // async function sendSubmissions() {
-    //   if (isAuthenticated) {
-    //     console.log('authenticated yes')
-    //     const theSubmissions = await submissions.find().toArray()
-    //     send({
-    //       type: 'update',
-    //       submissions: theSubmissions.map(annotateSubmission),
-    //     })
-    //   }
-    // }
-
-    // async function sendGlobals(changeEvent) {
-    //   if (isAuthenticated) {
-    //     send({
-    //       type: 'update:globals',
-    //       globals: changeEvent?.fullDocument ?? (await globals.findOne({})),
-    //     })
-    //     sendSubmissions()
-    //   }
-    // }
 
     async function sendSubmissions(changeEvent, theGlobals) {
       if (isAuthenticated) {
@@ -79,6 +59,7 @@ module.exports = async function admin(server) {
       }
     })
 
+    // Whenever the submissions or globals change in MongoDB, send admins an update.
     server.mongoWatchers.submissions.on('change', sendSubmissions)
     server.mongoWatchers.globals.on('change', sendGlobals)
 

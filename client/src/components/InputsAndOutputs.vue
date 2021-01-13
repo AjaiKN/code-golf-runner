@@ -1,4 +1,6 @@
 <template>
+  <!-- Displaying a table of inputs and outputs -->
+
   <table class="inner-table">
     <thead>
       <th>In</th>
@@ -47,3 +49,13 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped>
+table {
+  margin: 0;
+}
+
+td {
+  padding: 3px;
+}
+</style>

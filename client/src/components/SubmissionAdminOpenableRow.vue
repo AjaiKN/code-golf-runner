@@ -1,4 +1,6 @@
 <template>
+  <!-- Allow admin to click on a row to view more information about a submission -->
+
   <SubmissionAdminRow
     :submission="submission"
     @click="showFullView = !showFullView"
@@ -21,3 +23,10 @@ export default defineComponent({
   data: () => ({ showFullView: false }),
 })
 </script>
+
+<style scoped>
+.full-results-view-cell {
+  padding: 1rem 10rem;
+  border: none;
+}
+</style>

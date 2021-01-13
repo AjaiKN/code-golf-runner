@@ -10,30 +10,10 @@ html {
   margin: 1rem 2rem;
 }
 
-.login {
-  padding: 1.5rem 1rem;
-  padding: 0.5em;
-}
-.login label,
-.login .submit-button {
-  display: block;
-  margin-top: 1rem;
-}
-.login input {
-  display: block;
-  margin-top: 0.3rem;
-  width: 100%;
-  font-size: 18px;
-}
-
 input:read-only,
 button:disabled {
   background-color: gray;
   cursor: default;
-}
-
-.edit-button {
-  font-size: 1rem;
 }
 
 table thead th {
@@ -55,28 +35,10 @@ form button {
   font-weight: bolder;
 }
 
-.inner-table {
-  margin: 0;
-}
-
-.inner-table td {
-  padding: 3px;
-}
-
 pre,
 code {
   margin: 0;
   padding: 0;
-}
-
-.small {
-  font-size: 0.7em;
-  line-height: normal;
-}
-
-.full-results-view-cell {
-  padding: 1rem 10rem;
-  border: none;
 }
 
 #app {

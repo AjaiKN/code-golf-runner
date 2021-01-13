@@ -1,4 +1,6 @@
 <template>
+  <!-- The submissions table on the admin page -->
+
   <table style="font-size: 15px">
     <thead>
       <th style="width: 1rem">Status</th>

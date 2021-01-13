@@ -20,6 +20,7 @@ export function normalizeInput(str: string) {
   return trimAllLines(str) + '\n'
 }
 
+/** Evaluate whether a submission is correct and the reason why */
 function isCorrect(
   submission: AnnotatedSubmission,
   question: Question,
@@ -74,6 +75,7 @@ function isCorrect(
   return { correct: true, reason: 'correct' }
 }
 
+/** Annotate a submission by adding the correctness and marking which inputs/outputs are correct */
 export function annotateSubmission(
   originalSubmission: Submission,
   questions: Question[],
@@ -106,6 +108,7 @@ export function annotateSubmission(
   })
 }
 
+/** Annotate a submission, except return null if the question isn't over yet */
 function annotateAndCensorSubmission(
   originalSubmission: Submission,
   questions: Question[],
@@ -123,6 +126,8 @@ function annotateAndCensorSubmission(
   })
 }
 
+/** Returns the annotated versions of the submissions,
+ * except only the ones where the questions are finished */
 export function annotateAndCensorSubmissions(
   submissions: Submission[],
   globals: Globals,
@@ -133,6 +138,8 @@ export function annotateAndCensorSubmissions(
     .map((s) => annotateAndCensorSubmission(s, globals.questions))
 }
 
+/** Remove a question if it hasn't started, and
+ * remove the expected outputs from a question if it isn't finished */
 function censorQuestion(question: Question): null | Question {
   switch (question.status) {
     case 'notStarted':

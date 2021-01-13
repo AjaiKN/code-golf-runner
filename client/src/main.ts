@@ -9,8 +9,7 @@ import 'hack/dist/dark.css'
 
 const routes = [
   { path: '/admin', component: () => import('./routes/admin.vue') },
-  { path: '/golf', component: Golf },
-  { path: '/', redirect: '/golf' },
+  { path: '/', component: Golf },
 ]
 
 const router = createRouter({

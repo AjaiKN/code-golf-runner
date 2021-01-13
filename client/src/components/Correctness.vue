@@ -1,4 +1,6 @@
 <template>
+  <!-- Display correctness of a question, along with a little icon -->
+
   <div style="display: flex; align-items: center">
     <div>
       <component :is="'Zondicon' + iconName" />
