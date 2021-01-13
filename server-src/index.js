@@ -13,7 +13,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 server.register(require('fastify-cors'))
 
-fastify.register(require('fastify-sensible'))
+server.register(require('fastify-sensible'))
 
 server.register(require('fastify-websocket'))
 
