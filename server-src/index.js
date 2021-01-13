@@ -10,8 +10,8 @@ const server = fastify({
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
-  server.register(require('fastify-cors'))
 }
+server.register(require('fastify-cors'))
 
 server.register(require('fastify-websocket'))
 
