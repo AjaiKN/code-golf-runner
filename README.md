@@ -4,7 +4,7 @@ A website for running the TechOlympics 2021 code golf competition. Golfers submi
 
 ## Basic Structure
 
-This website is made up of 3 components.
+This website is made up of 3 parts.
 
 - The **client** code that runs in the browser (currently served by Netlify). Responsible for displaying the UI to golfers and admins. Source code is in the `client` directory.
 - The **server** (currently run on Heroku). Responsible for syncing the client and crawler with the database (MongoDB). Source code is in the `server-src` directory. The configuration files for the server, like `package.json` and `yarn.lock`, are in the root directory of this repo.
