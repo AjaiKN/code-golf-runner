@@ -136,6 +136,10 @@ const WebSocket = require('ws')
 /** @type {WebSocket} */
 let socket
 
+let SERVER_URL = process.env.SERVER_URL || 'http://localhost:3000'
+// remove trailing slash
+SERVER_URL = SERVER_URL.replace(/\/$/, '')
+
 const disconnected = _.throttle(() => {
   console.log('disconnected')
   setTimeout(() => {
@@ -148,7 +152,7 @@ const disconnected = _.throttle(() => {
 }, 2000)
 
 function connectWebsocket() {
-  socket = new WebSocket(process.env.SERVER_URL + '/crawler', {
+  socket = new WebSocket(SERVER_URL + '/crawler', {
     headers: { password: process.env.PASSWORD },
   })
 
