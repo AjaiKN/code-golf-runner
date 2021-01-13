@@ -5,7 +5,7 @@
     "node": "15.x"
   },
   "scripts": {
-    "dev": "ts-node-dev --transpile-only index.js",
+    "dev": "ts-node-dev --transpile-only server-src/index.js",
     "build": "tsc --noEmit false",
     "start": "node dist/index.js"
   },
