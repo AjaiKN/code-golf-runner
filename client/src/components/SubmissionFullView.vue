@@ -8,7 +8,10 @@
     <span v-if="submission.isLate" style="color: red">(Late)</span>
   </p>
   <p>
-    <a :href="submission.submission">{{ submission.submission }}</a>
+    <a :href="submission.submission" target="_blank" rel="noopener noreferrer">
+      {{ submission.submission }}
+    </a>
+    (opens in new tab/window)
   </p>
   <template v-if="submission.result">
     <p v-if="!isAdmin">{{ submission.result.lang }}</p>
