@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue'
-import { Correctness } from '../../../server/types'
+import type { Correctness } from '../../../server-src/types'
 import ZondiconCheckmark from './ZondiconCheckmark.vue'
 import ZondiconX from './ZondiconX.vue'
 import ZondiconRefresh from './ZondiconRefresh.vue'

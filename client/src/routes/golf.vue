@@ -32,7 +32,7 @@ import {
   ref,
   watchEffect,
 } from 'vue'
-import type { Globals, Submission } from '../../../server/types'
+import type { Globals, Submission } from '../../../server-src/types'
 import GolfLoginForm from '../components/GolfLoginForm.vue'
 import ShowConnectivity from '../components/ShowConnectivity.vue'
 import { useWebsocket } from '../http'

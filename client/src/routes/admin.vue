@@ -27,7 +27,7 @@
 <script lang="ts">
 import { debounce } from 'lodash-es'
 import { computed, defineComponent, ref, watchEffect } from 'vue'
-import type { AnnotatedSubmission } from '../../../server/types'
+import type { AnnotatedSubmission } from '../../../server-src/types'
 import AdminQuestionStatusControl from '../components/AdminQuestionStatusControl.vue'
 import QuestionSelection from '../components/QuestionSelection.vue'
 import ShowConnectivity from '../components/ShowConnectivity.vue'

@@ -39,7 +39,7 @@ import RenderMarkdown from './RenderMarkdown.vue'
 import SubmitAnswer from './SubmitAnswer.vue'
 import QuestionSelection from './QuestionSelection.vue'
 import { useCurrentQuestionNum } from '../useCurrentQuestionNum'
-import type { Question } from '../../../server/types'
+import type { Question } from '../../../server-src/types'
 
 export default defineComponent({
   components: {

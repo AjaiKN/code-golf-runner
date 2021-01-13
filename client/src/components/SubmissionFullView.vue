@@ -59,7 +59,7 @@
 import { getHumanTime } from '../getHumanTime'
 import { defineComponent, PropType } from 'vue'
 import InputsAndOutputs from './InputsAndOutputs.vue'
-import { Submission } from '../../../server/types'
+import type { Submission } from '../../../server-src/types'
 import Correctness from './Correctness.vue'
 
 export default defineComponent({

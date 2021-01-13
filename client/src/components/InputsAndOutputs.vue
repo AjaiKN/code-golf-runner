@@ -32,7 +32,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, h, PropType } from 'vue'
-import type { AnnotatedResultInputOutput } from '../../../server/types'
+import type { AnnotatedResultInputOutput } from '../../../server-src/types'
 import DebugInfo from './DebugInfo.vue'
 
 export default defineComponent({

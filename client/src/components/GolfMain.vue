@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { defineComponent, inject, PropType, ref } from 'vue'
-import type { Globals, Question, Submission } from '../../../server/types'
+import type { Globals, Question, Submission } from '../../../server-src/types'
 import GolfQuestionBox from './GolfQuestionBox.vue'
 import RenderMarkdown from './RenderMarkdown.vue'
 import SubmissionGolf from './SubmissionGolf.vue'
