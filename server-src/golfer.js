@@ -112,17 +112,42 @@ module.exports = async function golfer(server) {
         body: S.object()
           .prop('name', S.string().required())
           .prop('secretPhrase', S.string().required())
-          .prop('submission', S.string().required()),
+          .prop('submission', S.string().required())
+          .prop('questionNum', S.number().required()),
       },
     },
     async (/** @type any */ req) => {
       const timestamp = new Date()
       const { body } = req
 
-      const person = await server.mongo.db
-        .collection('golfers')
-        .findOne({ _id: body.name, secretPhrase: body.secretPhrase })
-      if (!person) return
+      const person = await golfers.findOne({
+        _id: body.name,
+        secretPhrase: body.secretPhrase,
+      })
+      if (!person)
+        throw server.httpErrors.unauthorized(
+          'There is no person with that name and secret phrase',
+        )
+
+      const { questionNum } = body
+      /** @type {import('./types').Globals} */
+      const theGlobals = await globals.findOne({})
+      const question = theGlobals.questions.find(
+        (q) => q.questionNum === questionNum,
+      )
+      if (!question)
+        throw server.httpErrors.notFound(`There is no question #${questionNum}`)
+      const { status } = question
+      if (status === 'notStarted')
+        throw server.httpErrors.forbidden(
+          `Question #${questionNum} hasn't started yet`,
+        )
+      else if (status === 'finished') body.isLate = true
+
+      // Don't let golfers cheat by using these properties
+      delete body.result
+      delete body.overrideIsCorrect
+      // Don't put the secret phrase into the submission document
       delete body.secretPhrase
 
       await submissions.insertOne({ ...req.body, timestamp })
