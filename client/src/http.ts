@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-const SERVER_URL = process.env.VITE_SERVER_URL ?? 'http://localhost:3000'
+const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:3000'
 
 function resolvePath(path: string) {
   if (path.startsWith('/')) path = SERVER_URL + path
