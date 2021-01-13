@@ -22,6 +22,20 @@ server.register(require('fastify-mongodb'), {
   url: process.env.MONGO_URI,
 })
 
+// Create globals document if it doesn't exist
+server.register(async (theServer) => {
+  try {
+    await theServer.mongo.db.collection('globals').insertOne({
+      _id: 'globals',
+      introduction: '',
+      questions: [],
+    })
+    console.log('created globals document')
+  } catch (e) {
+    console.log('globals document already exists')
+  }
+})
+
 server.register(require('./mongo-watchers'))
 
 server.register(require('./admin'))
