@@ -22,7 +22,7 @@ This website is made up of 3 components.
     PASSWORD=mysecretpassword (this doesn't really matter yet since you're just testing)
     ```
 
-    2. **`.env` (in `crawler` directory)**: This should look like
+    2. **`.env.development` (in `crawler` directory)**: This should look like
 
     ```
     PASSWORD=the same password you used in .env

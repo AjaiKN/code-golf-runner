@@ -116,9 +116,7 @@ async function testTioRunCode(url, inputs) {
   return ret
 }
 
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config()
-}
+require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` })
 
 function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds))
