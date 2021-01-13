@@ -28,9 +28,10 @@ server.register(require('./crawler'))
 
 async function start() {
   try {
-    const PORT = process.env.PORT || 3000
+    const port = process.env.PORT || 3000
+    const host = '0.0.0.0'
 
-    await server.listen(PORT)
+    await server.listen({ port, host: '0.0.0.0' })
   } catch (err) {
     server.log.error(err)
     process.exit(1)
