@@ -2,6 +2,9 @@ const S = require('fluent-json-schema').default
 const { genSecretPhrase } = require('./diceware.js')
 const { limitRate } = require('./auth-rate-limit.js')
 const { censorGlobals, annotateAndCensorSubmissions } = require('./questions')
+const querystring = require('querystring')
+const { produce, setAutoFreeze } = require('immer')
+setAutoFreeze(false)
 
 /** @type {import('fastify').FastifyPluginAsync<{}>} */
 module.exports = async function golfer(server) {
@@ -104,6 +107,59 @@ module.exports = async function golfer(server) {
     })
   })
 
+  // @ts-ignore
+  server.register(require('fastify-formbody'))
+
+  const { badGateway, notFound, forbidden } = server.httpErrors
+
+  async function submit(body) {
+    const person = await golfers.findOne({
+      _id: body.name,
+      secretPhrase: body.secretPhrase,
+    })
+    if (!person)
+      return {
+        status: badGateway().status,
+        message: 'There is no person with that name and secret phrase',
+      }
+
+    const { questionNum } = body
+    /** @type {import('./types').Globals} */
+    const theGlobals = await globals.findOne({})
+    const question = theGlobals.questions.find(
+      (q) => q.questionNum === questionNum,
+    )
+    if (!question)
+      return {
+        status: notFound().status,
+        message: `There is no question #${questionNum}`,
+      }
+
+    switch (question.status) {
+      case 'notStarted':
+        return {
+          status: forbidden().status,
+          message: `Question #${questionNum} hasn't started yet`,
+        }
+      case 'finished':
+        body.isLate = true
+    }
+
+    await submissions.insertOne(
+      produce(body, (draft) => {
+        // Don't let golfers cheat by using these properties
+        delete draft.result
+        delete draft.overrideIsCorrect
+        // Don't put the secret phrase into the submission document
+        delete draft.secretPhrase
+      }),
+    )
+    return {
+      status: 200,
+      message: `Submission submitted successfully at ${body.timestamp}`,
+    }
+  }
+
   // Accepting submissions (via POST request)
   server.post(
     '/submission',
@@ -113,45 +169,32 @@ module.exports = async function golfer(server) {
           .prop('name', S.string().required())
           .prop('secretPhrase', S.string().required())
           .prop('submission', S.string().required())
-          .prop('questionNum', S.number().required()),
+          .prop('questionNum', S.description('can be string or number')),
       },
     },
-    async (/** @type any */ req) => {
-      const timestamp = new Date()
-      const { body } = req
+    async (/** @type {any} */ req, reply) => {
+      req.body.timestamp = new Date()
+      req.body.questionNum = parseInt(req.body.questionNum)
 
-      const person = await golfers.findOne({
-        _id: body.name,
-        secretPhrase: body.secretPhrase,
-      })
-      if (!person)
-        throw server.httpErrors.unauthorized(
-          'There is no person with that name and secret phrase',
-        )
-
-      const { questionNum } = body
-      /** @type {import('./types').Globals} */
-      const theGlobals = await globals.findOne({})
-      const question = theGlobals.questions.find(
-        (q) => q.questionNum === questionNum,
-      )
-      if (!question)
-        throw server.httpErrors.notFound(`There is no question #${questionNum}`)
-      const { status } = question
-      if (status === 'notStarted')
-        throw server.httpErrors.forbidden(
-          `Question #${questionNum} hasn't started yet`,
-        )
-      else if (status === 'finished') body.isLate = true
-
-      // Don't let golfers cheat by using these properties
-      delete body.result
-      delete body.overrideIsCorrect
-      // Don't put the secret phrase into the submission document
-      delete body.secretPhrase
-
-      await submissions.insertOne({ ...req.body, timestamp })
-      return {}
+      const { message, status } = await submit(req.body)
+      const shouldRespondWithHtml =
+        req.headers['content-type'] === 'application/x-www-form-urlencoded'
+      reply.statusCode = status
+      if (shouldRespondWithHtml) {
+        const stuff = { message, ...req.body }
+        if (status === 200) {
+          delete stuff.submission
+          stuff.questionNum++
+        }
+        return reply.redirect(303, '/?' + querystring.stringify(stuff))
+      } else {
+        reply.send(message)
+      }
     },
   )
+
+  // simple HTML submission form
+  server.get('/', (/** @type {any} */ req, reply) => {
+    reply.view('./server-src/simplesubmission.mustache.html', req.query ?? {})
+  })
 }
