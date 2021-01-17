@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<!-- This page is a simple form that doesn't use JavaScript. Can be used as a backup if something goes wrong. -->
+
+<title>Plain Submission Form | TechOlympics: Code Golf</title>
+
+<meta charset="UTF-8" />
+<link rel="icon" href="/favicon.png" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+  form {
+    padding: 20px;
+  }
+
+  form div {
+    padding: 5px;
+  }
+</style>
+
+<h1>Plain Code Golf Submission Form</h1>
+
+<p>
+  Don't use this page unless the regular one doesn't work for you. You'll have
+  to ask a test administrator to create a secret phrase for you.
+</p>
+
+<form method="POST" action="/submission">
+  <div>
+    <label for="name">Your Name:&nbsp;&nbsp;&nbsp;</label>
+    <input id="name" name="name" value="{{name}}" />
+  </div>
+
+  <div>
+    <label for="secretPhrase">Secret Phrase:</label>
+    <input id="secretPhrase" name="secretPhrase" value="{{secretPhrase}}" />
+  </div>
+
+  <div>
+    <label for="questionNum">Question Number:</label>
+    <input
+      id="questionNum"
+      name="questionNum"
+      type="number"
+      value="{{questionNum}}"
+    />
+  </div>
+
+  <div>
+    <label for="submission">Tio.Run Link:</label>
+    <input id="submission" name="submission" value="{{submission}}" />
+  </div>
+
+  <div>
+    <button>Submit</button>
+  </div>
+</form>
+
+<p>{{message}}</p>

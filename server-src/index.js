@@ -17,6 +17,12 @@ server.register(require('fastify-sensible'))
 
 server.register(require('fastify-websocket'))
 
+server.register(require('point-of-view'), {
+  engine: {
+    mustache: require('mustache'),
+  },
+})
+
 server.register(require('fastify-mongodb'), {
   forceClose: true,
   url: process.env.MONGO_URI,
