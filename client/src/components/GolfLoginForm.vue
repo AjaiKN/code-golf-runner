@@ -2,7 +2,7 @@
   <div class="login">
     Please use your actual name. (If you don't want to, contact the competition
     administrators first so they know who you are.) You won't be able to change
-    it later.
+    it later. Capitalization matters.
     <form @submit.prevent="submit">
       <div>
         <label for="name">Name:</label>
@@ -11,7 +11,7 @@
           id="name"
           name="name"
           :readonly="isSubmittingForm || showSecretPhraseInput"
-          v-model="myName"
+          v-model.trim="myName"
         />
         <button
           v-if="showSecretPhraseInput"
@@ -29,7 +29,7 @@
           <input
             required
             :readonly="isSubmittingForm"
-            v-model="mySecretPhrase"
+            v-model.trim="mySecretPhrase"
           />
         </label>
       </div>
