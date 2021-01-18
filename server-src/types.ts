@@ -51,7 +51,6 @@ export interface Submission {
   timestamp: string
   result?: Result | null | undefined
   overrideIsCorrect?: boolean
-  // TODO: actually add these
   isLate: boolean
   questionNum: number
 }
