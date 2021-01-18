@@ -42,6 +42,8 @@ This website is made up of 3 parts.
     2. To see the admin page, go to <http://localhost:5000/admin#mysecretpassword> (replace `mysecretpassword` with whatever you put in the `.env` files).
     3. If you change any of the code, it will rerun automatically.
 
+To run the admin textual tools (which allow you to do stuff like renaming players), run `yarn admin-tools`.
+
 ## Running in production
 
 TODO. (If you want to do this and I haven't finished this section yet, please ask me.)
