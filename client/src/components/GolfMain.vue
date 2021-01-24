@@ -12,7 +12,7 @@
     Your secret phrase is <b>{{auth.secretPhrase}}</b>. Write it down!
   </p>
 
-  <RenderMarkdown :markdown="globals.introduction" />
+  <RenderMarkdown :markdown="description + '\n\n' + globals.introduction" />
 
   <div class="question-container">
     <GolfQuestionBox :questions="globals.questions" />
@@ -27,6 +27,7 @@ import type { Globals, Question, Submission } from '../../../server-src/types'
 import GolfQuestionBox from './GolfQuestionBox.vue'
 import RenderMarkdown from './RenderMarkdown.vue'
 import SubmissionGolf from './SubmissionGolf.vue'
+import description from '../description'
 
 export default defineComponent({
   components: { RenderMarkdown, SubmissionGolf, GolfQuestionBox },
@@ -38,7 +39,7 @@ export default defineComponent({
   setup(props) {
     const auth = inject('auth') as any
 
-    return { auth }
+    return { auth, description }
   },
 })
 </script>
