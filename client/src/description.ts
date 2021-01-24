@@ -3,7 +3,12 @@
 const description = `
 You will be given a series of coding problems, and you will try to solve them using the smallest number of bytes of code.
 
-You will use the site <https://tio.run/>. To submit your solution, click on the link icon at the top of the page, then press the copy button to the right of the “Plain URL”. Paste that into the input box below. You can make multiple submissions for a question, and only your last one will count (late submissions don’t count at all). 
+You will use the site <https://tio.run/>. 
+To submit your solution, click on the link icon at the top of the page, then press the copy button to the right of the “Plain URL”. 
+Paste that into the input box below. 
+You can make multiple submissions for a question, and only your last one will count (late submissions don’t count at all). 
+(Note: in <https://tio.run/>, the URL in the browser bar won't change automatically when you change the code. 
+You have to actually press the copy URL button whenever you change your code.)
 
 Input and Output
 * Your program must accept inputs given as STDIN, standard input (the “Input” section in <https://tio.run/>). The input given to your program will end with a newline.
