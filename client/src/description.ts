@@ -1,4 +1,4 @@
-// Uses markdown for formatting
+// This file uses markdown for formatting
 
 const description = `
 You will be given a series of coding problems, and you will try to solve them using the smallest number of bytes of code.
@@ -9,7 +9,21 @@ Input and Output
 * Your program must accept inputs given as STDIN, standard input (the “Input” section in <https://tio.run/>). The input given to your program will end with a newline.
 * Your program must provide the output using STDOUT, standard output (the “Output” section in <https://tio.run/>.) Whitespace and newlines at the end of your output don’t matter.
 
-If you have any questions, please ask!
+Scoring
+* For each question, participants will be ranked — first by byte count, then (to resolve ties) by submission time.
+* For each question, you get
+  * 8 points if you're in 1st place
+  * 7 points if you're in 2nd place
+  * 6 points if you're in 3rd place
+  * 5 points if you're in 4rd place
+  * 4 points if you're below 4th place but your submission was correct
+* Late submissions don't count; if you submit your answer late, that's the same as not submitting it at all.
+* If there's a tie at the end, they will be resolved using these criteria (each one applies only if there's still a tie with the previous one):
+  1. Total number of questions correct
+  2. Total byte count
+  3. Total time
+
+If you have any questions, please ask! Have fun and please don't try to cheat.
 
 To see the programming languages that are allowed, go to <https://tio.run/> and **deselect “Recreational”** at the top so that only the “Practical” languages are visible. (You can also see the list of allowed languages below.)
 
