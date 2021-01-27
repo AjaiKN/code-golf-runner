@@ -44,3 +44,8 @@ code {
 #app {
   margin-top: 5rem;
 }
+
+/* show that links open in new tab for accessibility */
+a[target='_blank']::after {
+  content: '↗️';
+}
