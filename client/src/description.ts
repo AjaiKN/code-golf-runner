@@ -29,6 +29,7 @@ Scoring
   3. Total time
 
 If you have any questions, please ask! Have fun and please don't try to cheat.
+You may use the Internet to look up stuff about your programming language, for example, but don't collaborate with others or Google the specific question.
 
 To see the programming languages that are allowed, go to <https://tio.run/> and **deselect “Recreational”** at the top so that only the “Practical” languages are visible. (You can also see the list of allowed languages below.)
 
