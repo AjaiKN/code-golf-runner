@@ -84,8 +84,12 @@ export default defineComponent({
         'update:globals'(message) {
           globals.value = message.globals
         },
-        'update:submissions'({ submissions }) {
-          submittedForms.value = submissions.reverse()
+        'update:submissions'({ submissions }: { submissions: Submission[] }) {
+          submittedForms.value = submissions.sort((a, b) => {
+            return (
+              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+            )
+          })
         },
         authenticated(authInfo) {
           if (authStatus.value.type === 'login')

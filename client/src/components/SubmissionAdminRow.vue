@@ -2,6 +2,7 @@
   <!-- Displaying a submission as a table row on the admin page -->
 
   <tr>
+    <td>{{ submission.score ?? '' }}</td>
     <td>
       <div style="display: flex; justify-content: center">
         <Correctness :correctness="submission.correctness" />
