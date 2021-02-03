@@ -3,7 +3,10 @@ import type {
   AnnotatedSubmission,
   Correctness,
   Globals,
+  OutdatableAnnotatedSubmission,
   Question,
+  Ranking,
+  ScoredSubmission,
   Submission,
 } from './types'
 
@@ -76,7 +79,7 @@ function isCorrect(
 }
 
 /** Annotate a submission by adding the correctness and marking which inputs/outputs are correct */
-export function annotateSubmission(
+function annotateSubmission(
   originalSubmission: Submission,
   questions: Question[],
 ): AnnotatedSubmission {
@@ -109,33 +112,21 @@ export function annotateSubmission(
 }
 
 /** Annotate a submission, except return null if the question isn't over yet */
-function annotateAndCensorSubmission(
-  originalSubmission: Submission,
+function censorSubmission(
+  scoredSubmission: ScoredSubmission,
   questions: Question[],
 ) {
-  const annotated = annotateSubmission(originalSubmission, questions)
   const question = questions.find(
-    (q) => q.questionNum === annotated.questionNum,
+    (q) => q.questionNum === scoredSubmission.questionNum,
   )
-  return produce(annotated, (draft) => {
+  return produce(scoredSubmission, (draft) => {
     if (question.status !== 'finished') {
       delete draft.correctness
       delete draft.overrideIsCorrect
+      delete draft.score
       if (draft.result) delete draft.result.inputsOutputs
     }
   })
-}
-
-/** Returns the annotated versions of the submissions,
- * except only the ones where the questions are finished */
-export function annotateAndCensorSubmissions(
-  submissions: Submission[],
-  globals: Globals,
-  name: string,
-) {
-  return submissions
-    .filter((s) => s.name === name)
-    .map((s) => annotateAndCensorSubmission(s, globals.questions))
 }
 
 /** Remove a question if it hasn't started, and
@@ -161,4 +152,158 @@ export function censorGlobals(globals: Globals): Globals {
     ...globals,
     questions: globals.questions.map(censorQuestion).filter((q) => q != null),
   }
+}
+
+function getScoreFromPlaceAssumingCorrect(place: number) {
+  // prettier-ignore
+  switch (place) {
+    case 1:  return 8
+    case 2:  return 7
+    case 3:  return 6
+    case 4:  return 5
+    default: return 4
+  }
+}
+
+// TODO: categories:
+// 1. correct
+// 2. incorrect
+// 3. not yet graded
+// 4. outdated (there's a newer submission by this person)
+// 5. late
+
+// assumes they're all for the same question
+function scoreSubmissionsForQuestion(
+  annotatedSubmissions: OutdatableAnnotatedSubmission[],
+): ScoredSubmission[] {
+  // TODO: score override
+  const sorted = annotatedSubmissions.sort((s1, s2) => {
+    if (s1.correctness.correct && !s2.correctness.correct) return -1
+    if (!s1.correctness.correct && s2.correctness.correct) return +1
+    let ret = 0
+    if (s1.result?.code != null && s2.result?.code != null) {
+      // TODO: DON'T USE CODE LENGTH, USE BYTES
+      ret = s1.result.code.length - s2.result.code.length
+    }
+    if (ret !== 0) return ret
+    ret = new Date(s1.timestamp).getTime() - new Date(s2.timestamp).getTime()
+    return ret
+  })
+
+  const scored = sorted.map((submission, index) => {
+    const place = submission.correctness.correct ? index + 1 : null
+    const score =
+      place == null ? 0 : getScoreFromPlaceAssumingCorrect(index + 1)
+    return { ...submission, score }
+  })
+
+  return scored
+}
+
+// assumes they're all for the same question
+function markOutdatedSubmissionsForQuestion(
+  annotatedSubmissions: AnnotatedSubmission[],
+): OutdatableAnnotatedSubmission[] {
+  return annotatedSubmissions.map((submission) => {
+    if (typeof submission._id !== 'string')
+      console.error(`non-string _id: ${submission._id}`)
+    else if (isNaN(new Date(submission.timestamp).getTime()))
+      console.error(`invalid timestamp: ${submission.timestamp}`)
+
+    const laterOnTimeSubmissionsByThisPerson = annotatedSubmissions.filter(
+      (s) =>
+        s.name === submission.name &&
+        !s.isLate &&
+        s._id !== submission._id &&
+        new Date(s.timestamp).getTime() >
+          new Date(submission.timestamp).getTime(),
+    )
+
+    const isOutdated = laterOnTimeSubmissionsByThisPerson.length > 0
+
+    const ret = {
+      ...submission,
+      isOutdated,
+    }
+
+    if (isOutdated) {
+      ret.correctness = {
+        correct: false,
+        reason: "outdated (there's a newer, on-time submission)",
+      }
+    }
+
+    return ret
+  })
+}
+
+function scoreSubmissions(
+  annotatedSubmissions: AnnotatedSubmission[],
+  globals: Globals,
+  censorUnfinishedQuestionsForRanking = false,
+): ScoredSubmission[] {
+  let questionNums = globals.questions
+    .filter(
+      (q) => !censorUnfinishedQuestionsForRanking || q.status === 'finished',
+    )
+    .map((q) => q.questionNum)
+  return questionNums.flatMap((questionNum) =>
+    scoreSubmissionsForQuestion(
+      markOutdatedSubmissionsForQuestion(
+        annotatedSubmissions.filter((s) => s.questionNum === questionNum),
+      ),
+    ),
+  )
+}
+
+export function score(
+  submissions: Submission[],
+  globals: Globals,
+  golferName?: string,
+) {
+  const shouldCensor = golferName != null
+  const annotated = submissions.map((s) =>
+    annotateSubmission(s, globals.questions),
+  )
+
+  let scored = scoreSubmissions(annotated, globals)
+
+  if (shouldCensor) {
+    scored = scored
+      .filter((s) => s.name === golferName)
+      .map((s) => censorSubmission(s, globals.questions))
+  }
+
+  return scored
+}
+
+export function getPeopleRankings(
+  submissions: Submission[],
+  globals: Globals,
+  censorUnfinishedQuestions: boolean,
+): Ranking[] {
+  const scoredSubmissions = scoreSubmissions(
+    submissions.map((s) => annotateSubmission(s, globals.questions)),
+    globals,
+    censorUnfinishedQuestions,
+  )
+
+  const scores: Record<string, number> = {}
+  for (const s of scoredSubmissions) {
+    const currentScore = scores[s.name] ?? 0
+    scores[s.name] = currentScore + s.score
+  }
+  const ret = Object.entries(scores)
+    .map(([name, score]) => ({ name, score, ranking: 0 }))
+    .sort((a, b) => b.score - a.score)
+
+  let previousScore: number
+  let ranking = 0
+  for (const thing of ret) {
+    if (thing.score !== previousScore) ranking++
+    thing.ranking = ranking
+    previousScore = thing.score
+  }
+
+  return ret.filter(({ score }) => score !== 0)
 }

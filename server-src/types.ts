@@ -45,14 +45,17 @@ export interface AnnotatedResult extends Result {
 }
 
 export interface Submission {
+  _id?: string
   name: string
   /** submission URL */
-  submission: string | Date
-  timestamp: string
+  submission: string
+  timestamp: string | Date
   result?: Result | null | undefined
   overrideIsCorrect?: boolean
   isLate: boolean
   questionNum: number
+  /** for humans and tests */
+  notes?: any
 }
 
 export interface Correctness {
@@ -63,4 +66,18 @@ export interface Correctness {
 export interface AnnotatedSubmission extends Submission {
   result?: AnnotatedResult | null | undefined
   correctness: Correctness
+}
+
+export interface OutdatableAnnotatedSubmission extends AnnotatedSubmission {
+  isOutdated: boolean
+}
+
+export interface ScoredSubmission extends OutdatableAnnotatedSubmission {
+  score: number
+}
+
+export interface Ranking {
+  ranking: number
+  name: string
+  score: number
 }

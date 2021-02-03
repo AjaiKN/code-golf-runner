@@ -1,5 +1,5 @@
 const { limitRate } = require('./auth-rate-limit')
-const { annotateSubmission } = require('./questions')
+const { score, getPeopleRankings } = require('./questions')
 
 /** @type {import('fastify').FastifyPluginAsync<{}>} */
 module.exports = async function admin(server) {
@@ -23,9 +23,8 @@ module.exports = async function admin(server) {
 
         send({
           type: 'update',
-          submissions: theSubmissions.map((s) =>
-            annotateSubmission(s, theActualGlobals.questions),
-          ),
+          submissions: score(theSubmissions, theActualGlobals),
+          rankings: getPeopleRankings(theSubmissions, theActualGlobals, false),
         })
       }
     }

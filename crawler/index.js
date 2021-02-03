@@ -9,7 +9,7 @@ const WAIT_TIME = 10000
 /**
  * Testing a tio.run url
  * @param {string} url tio.run url
- * @param {string} inputs
+ * @param {string[]} inputs
  * @returns null if unable to run the submission. Otherwise, a results object
  * containing the results of running it against all the test cases, as well
  * as the code itself, the programming language, etc.

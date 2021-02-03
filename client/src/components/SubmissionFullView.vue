@@ -1,4 +1,6 @@
 <template>
+  <!-- TODO: add code length (USE BYTES, NOT LENGTH) -->
+
   <p v-if="!isAdmin">Question {{ submission.questionNum }}</p>
   <p>
     <Correctness :correctness="submission.correctness" :showReason="true" />

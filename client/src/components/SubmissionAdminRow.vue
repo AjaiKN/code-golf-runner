@@ -7,6 +7,7 @@
         <Correctness :correctness="submission.correctness" />
       </div>
     </td>
+    <!-- // TODO: DON'T USE CODE LENGTH, USE BYTES -->
     <td>{{ submission.result?.code?.length ?? '' }}</td>
     <td>{{ submission.name }}</td>
     <template v-if="submission.result">

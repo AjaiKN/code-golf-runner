@@ -1,7 +1,13 @@
 <template>
   <ShowConnectivity :is-connected="isConnected" />
 
-  <AdminQuestionStatusControl v-if="globals" v-model:globals="globals" />
+  <div style="display: flex; gap: 2rem; flex-wrap: wrap">
+    <AdminQuestionStatusControl v-if="globals" v-model:globals="globals" />
+    <Rankings
+      v-if="adminInfo?.rankings && adminInfo.rankings.length > 0"
+      :rankings="adminInfo.rankings"
+    />
+  </div>
 
   <div style="display: flex; align-items: center">
     <span>Question:&nbsp;</span>
@@ -29,11 +35,16 @@
 <script lang="ts">
 import { debounce } from 'lodash-es'
 import { computed, defineComponent, ref, watchEffect } from 'vue'
-import type { AnnotatedSubmission } from '../../../server-src/types'
+import type {
+  AnnotatedSubmission,
+  Globals,
+  Ranking,
+} from '../../../server-src/types'
 import AdminQuestionStatusControl from '../components/AdminQuestionStatusControl.vue'
 import QuestionSelection from '../components/QuestionSelection.vue'
 import ShowConnectivity from '../components/ShowConnectivity.vue'
 import SubmissionAdmin from '../components/SubmissionAdmin.vue'
+import Rankings from '../components/Rankings.vue'
 import { useWebsocket } from '../http'
 import { useCurrentQuestionNum } from '../useCurrentQuestionNum'
 
@@ -43,13 +54,14 @@ export default defineComponent({
     ShowConnectivity,
     AdminQuestionStatusControl,
     QuestionSelection,
+    Rankings,
   },
   setup() {
     const error = ref()
 
     const adminInfo = ref<{ submissions: AnnotatedSubmission[] }>()
 
-    const globals = ref()
+    const globals = ref<Globals>()
 
     const { isConnected, send } = useWebsocket('/admin', {
       onConnect: () => {

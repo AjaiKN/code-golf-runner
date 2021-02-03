@@ -1,7 +1,7 @@
 const S = require('fluent-json-schema').default
 const { genSecretPhrase } = require('./diceware.js')
 const { limitRate } = require('./auth-rate-limit.js')
-const { censorGlobals, annotateAndCensorSubmissions } = require('./questions')
+const { censorGlobals, score } = require('./questions')
 const querystring = require('querystring')
 const { produce, setAutoFreeze } = require('immer')
 setAutoFreeze(false)
@@ -34,7 +34,7 @@ module.exports = async function golfer(server) {
           submissions.find({ name: authentication.name }).toArray(),
         ])
 
-        const processedSubmissions = annotateAndCensorSubmissions(
+        const processedSubmissions = score(
           theSubmissions,
           theActualGlobals,
           authentication.name,
@@ -42,7 +42,12 @@ module.exports = async function golfer(server) {
 
         send({
           type: 'update:submissions',
-          submissions: processedSubmissions,
+          // delete scores because we didn't calculate them from all the submissions
+          submissions: produce(processedSubmissions, (draft) => {
+            for (const s of draft) {
+              delete s.score
+            }
+          }),
         })
       }
     }
