@@ -12,7 +12,7 @@ You have to actually press the copy URL button whenever you change your code.)
 
 Input and Output
 * Your program must accept inputs given as STDIN, standard input (the “Input” section in <https://tio.run/>). The input given to your program will end with a newline.
-* Your program must provide the output using STDOUT, standard output (the “Output” section in <https://tio.run/>.) Whitespace and newlines at the end of your output don’t matter.
+* Your program must provide the output using STDOUT, standard output (the “Output” section in <https://tio.run/>). Whitespace and newlines at the end of your output don’t matter.
 
 Scoring
 * For each question, participants will be ranked — first by byte count, then (to resolve ties) by submission time.
