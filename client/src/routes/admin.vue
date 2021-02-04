@@ -12,7 +12,7 @@
   <div style="display: flex; align-items: center">
     <span>Question:&nbsp;</span>
     <QuestionSelection
-      v-if="currentQuestionNum"
+      v-if="currentQuestionNum != null"
       v-model:currentQuestionNum="currentQuestionNum"
       :questionNums="questionNums"
     />
