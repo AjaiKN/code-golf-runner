@@ -51,8 +51,9 @@ export default defineComponent({
 </script>
 
 <style scoped>
-table {
+html body table.inner-table {
   margin: 0;
+  font-size: 1.3em;
 }
 
 td {

@@ -1,7 +1,7 @@
 <template>
   <!-- Displaying the debug info from tio.run output -->
 
-  <pre><code :style="style">{{text.big}}<div class="small">{{text.small}}</div></code></pre>
+  <pre><code :style="style">{{text.big}}<details class="small"><summary>Click for timing info</summary>{{text.small}}</details></code></pre>
 </template>
 
 <script lang="ts">
@@ -16,7 +16,7 @@ export default defineComponent({
       const regex = /^(.*)\n(Real time:.*)$/s
       const res = regex.exec(this.str)
       if (res == null) return { big: this.str, small: '' }
-      else return { big: res[1], small: res[2] }
+      else return { big: res[1].trim(), small: res[2] }
     },
     style(): any {
       return this.str.includes('Exit code: 0') ? {} : { color: 'red' }
@@ -29,5 +29,10 @@ export default defineComponent({
 .small {
   font-size: 0.7em;
   line-height: normal;
+}
+
+pre,
+code {
+  margin: 0 1rem;
 }
 </style>
