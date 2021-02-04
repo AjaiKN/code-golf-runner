@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb'
+
 export interface InputOutput {
   input: string
   output: string
@@ -45,7 +47,7 @@ export interface AnnotatedResult extends Result {
 }
 
 export interface Submission {
-  _id?: string
+  _id?: string | ObjectId
   name: string
   /** submission URL */
   submission: string

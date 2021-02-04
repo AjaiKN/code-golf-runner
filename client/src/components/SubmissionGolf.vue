@@ -8,7 +8,7 @@
       <div
         style="border: 0.5px solid white; margin-top: 1rem; padding: 2rem"
         v-for="form in submittedForms"
-        :key="form._id"
+        :key="form._id.toString()"
       >
         <SubmissionFullView :submission="form" />
       </div>

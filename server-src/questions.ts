@@ -205,16 +205,14 @@ function markOutdatedSubmissionsForQuestion(
   annotatedSubmissions: AnnotatedSubmission[],
 ): OutdatableAnnotatedSubmission[] {
   return annotatedSubmissions.map((submission) => {
-    if (typeof submission._id !== 'string')
-      console.error(`non-string _id: ${submission._id}`)
-    else if (isNaN(new Date(submission.timestamp).getTime()))
+    if (isNaN(new Date(submission.timestamp).getTime()))
       console.error(`invalid timestamp: ${submission.timestamp}`)
 
     const laterOnTimeSubmissionsByThisPerson = annotatedSubmissions.filter(
       (s) =>
         s.name === submission.name &&
         !s.isLate &&
-        s._id !== submission._id &&
+        s._id.toString() !== submission._id.toString() &&
         new Date(s.timestamp).getTime() >
           new Date(submission.timestamp).getTime(),
     )

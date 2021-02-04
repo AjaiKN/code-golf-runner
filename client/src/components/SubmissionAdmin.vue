@@ -16,7 +16,7 @@
       </tr>
       <SubmissionAdminOpenableRow
         v-for="submission in submissions"
-        :key="submission._id"
+        :key="submission._id.toString()"
         :submission="submission"
       />
     </tbody>

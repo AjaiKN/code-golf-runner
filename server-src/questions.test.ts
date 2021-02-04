@@ -2,6 +2,7 @@ import produce from 'immer'
 import { nanoid } from 'nanoid'
 import { getPeopleRankings, score } from './questions'
 import { Globals, Result, Submission } from './types'
+import { ObjectId } from 'mongodb'
 
 const globals: Globals = {
   introduction: '',
@@ -270,7 +271,7 @@ const submissions = [
 ]
 
 for (const s of submissions) {
-  s._id = nanoid()
+  s._id = Math.random() < 0.5 ? nanoid() : new ObjectId()
 }
 
 test('score', () => {
