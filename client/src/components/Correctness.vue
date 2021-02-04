@@ -22,6 +22,7 @@ import ZondiconCheckmark from './ZondiconCheckmark.vue'
 import ZondiconX from './ZondiconX.vue'
 import ZondiconRefresh from './ZondiconRefresh.vue'
 import ZondiconTimer from './ZondiconTimer.vue'
+import ZondiconTimerGray from './ZondiconTimerGray.vue'
 import ZondiconQuestion from './ZondiconQuestion.vue'
 import ZondiconBug from './ZondiconBug.vue'
 import ZondiconLines from './ZondiconLines.vue'
@@ -34,6 +35,7 @@ export default defineComponent({
     ZondiconX,
     ZondiconRefresh,
     ZondiconTimer,
+    ZondiconTimerGray,
     ZondiconQuestion,
     ZondiconBug,
     ZondiconLines,
@@ -51,6 +53,11 @@ export default defineComponent({
         if (props.correctness.correct) return 'Checkmark'
         else if (props.correctness.reason === 'still evaluating...')
           return 'Refresh'
+        else if (
+          props.correctness.reason ===
+          "outdated (there's a newer, on-time submission)"
+        )
+          return 'TimerGray'
         else if (props.correctness.reason === 'submitted late') return 'Timer'
         else if (props.correctness.reason === 'not all test cases were tested')
           return 'Question'
