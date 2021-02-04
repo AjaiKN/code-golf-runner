@@ -47,6 +47,11 @@ module.exports = async function golfer(server) {
             for (const s of draft) {
               delete s.score
             }
+          }).sort((a, b) => {
+            // sort by latest submission first
+            return (
+              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+            )
           }),
         })
       }
