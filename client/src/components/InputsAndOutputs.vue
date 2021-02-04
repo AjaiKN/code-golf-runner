@@ -53,7 +53,7 @@ export default defineComponent({
 <style scoped>
 html body table.inner-table {
   margin: 0;
-  font-size: 1.3em;
+  font-size: 1.1em;
 }
 
 td {
