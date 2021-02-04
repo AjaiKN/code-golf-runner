@@ -16,7 +16,7 @@ button:disabled {
   cursor: default;
 }
 
-table thead th {
+html table thead th {
   font-size: 1em;
 }
 
@@ -51,8 +51,7 @@ a[target='_blank']::after {
 }
 
 html,
-body,
-app {
+body {
   margin: 0;
   padding: 0;
 }
