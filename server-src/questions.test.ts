@@ -40,7 +40,10 @@ const globals: Globals = {
 }
 
 const correctResult = (numBytes: number): Result => ({
-  code: 'a'.repeat(numBytes),
+  code:
+    'This is the wrong number of bytes because we should be checking the codeBytes property instead' +
+    'a'.repeat(Math.floor(Math.random() * 20)),
+  codeBytes: numBytes,
   commandLineArguments: [],
   commandLineOptions: [],
   footer: null,
@@ -145,7 +148,10 @@ const submissions1 = (questionNum: number): Submission[] => [
 ]
 
 const correctResultForManyPeople = (numBytes: number): Result => ({
-  code: 'a'.repeat(numBytes),
+  code:
+    'This is the wrong number of bytes because we should be checking the codeBytes property instead' +
+    'a'.repeat(Math.floor(Math.random() * 20)),
+  codeBytes: numBytes,
   commandLineArguments: [],
   commandLineOptions: [],
   footer: null,
@@ -177,15 +183,6 @@ const submissionsManyPeople = (questionNum: number): Submission[] => [
     notes: { score: 7 },
   },
   {
-    name: 'C',
-    isLate: false,
-    questionNum,
-    submission: 'https://tio.run/##KypNqvz/v0AhPbWkWK8kPz5T2/D/fwA',
-    timestamp: '2021-01-24T19:36:38.319+00:00',
-    result: correctResultForManyPeople(3),
-    notes: { score: 6 },
-  },
-  {
     name: 'D',
     isLate: false,
     questionNum,
@@ -193,6 +190,15 @@ const submissionsManyPeople = (questionNum: number): Submission[] => [
     timestamp: '2021-01-24T19:36:38.319+00:00',
     result: correctResultForManyPeople(4),
     notes: { score: 5 },
+  },
+  {
+    name: 'C',
+    isLate: false,
+    questionNum,
+    submission: 'https://tio.run/##KypNqvz/v0AhPbWkWK8kPz5T2/D/fwA',
+    timestamp: '2021-01-24T19:36:38.319+00:00',
+    result: correctResultForManyPeople(3),
+    notes: { score: 6 },
   },
   // Yes, E is supposed to be missing
   {

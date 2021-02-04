@@ -96,9 +96,14 @@ async function testTioRunCode(url, inputs) {
 
     const inputsOutputs = await putInputs(inputs)
 
+    const codeInfo = await getValueOfId('code-info', 'textContent')
+    const [_, numBytesString] = codeInfo.match(/, (\d+) bytes/)
+    const codeBytes = parseInt(numBytesString)
+
     ret = {
       lang: await getValueOfId('lang-name', 'textContent'),
       code: await getValueOfId('code'),
+      codeBytes,
       inputsOutputs,
 
       // shouldn't exist, should be null
@@ -153,7 +158,8 @@ function connectWebsocket() {
   /** All the submissions the crawler has received */
   let submissions = []
   /**  */
-  const submissionsTodo = () => submissions.filter((s) => !s.doneRunning)
+  const submissionsWeNeedToStart = () =>
+    submissions.filter((s) => !s.doneRunning)
 
   socket.on('open', () => {
     console.log('socket open')
@@ -180,9 +186,9 @@ function connectWebsocket() {
       if (isRunningSelenium) return
 
       isRunningSelenium = true
-      while (submissionsTodo().length > 0) {
+      while (submissionsWeNeedToStart().length > 0) {
         console.log('starting')
-        const currentSubmission = submissionsTodo()[0]
+        const currentSubmission = submissionsWeNeedToStart()[0]
         const { submission, inputs, _id } = currentSubmission
         const result = await testTioRunCode(submission, inputs)
         console.log({ _id, result })

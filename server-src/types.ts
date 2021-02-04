@@ -35,6 +35,7 @@ export interface AnnotatedResultInputOutput extends ResultInputOutput {
 export interface Result {
   lang: string
   code: string
+  codeBytes: number
   inputsOutputs: ResultInputOutput[]
   header: null | string
   footer: null | string

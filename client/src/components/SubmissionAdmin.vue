@@ -5,7 +5,7 @@
     <thead>
       <th style="width: 1rem">Score</th>
       <th style="width: 1rem">Status</th>
-      <th style="width: 1rem">Chars</th>
+      <th style="width: 1rem">Bytes</th>
       <th>Name</th>
       <th>Language</th>
       <th>Code</th>

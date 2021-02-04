@@ -182,8 +182,7 @@ function scoreSubmissionsForQuestion(
     if (!s1.correctness.correct && s2.correctness.correct) return +1
     let ret = 0
     if (s1.result?.code != null && s2.result?.code != null) {
-      // TODO: DON'T USE CODE LENGTH, USE BYTES
-      ret = s1.result.code.length - s2.result.code.length
+      ret = s1.result.codeBytes - s2.result.codeBytes
     }
     if (ret !== 0) return ret
     ret = new Date(s1.timestamp).getTime() - new Date(s2.timestamp).getTime()

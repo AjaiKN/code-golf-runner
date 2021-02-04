@@ -1,6 +1,4 @@
 <template>
-  <!-- TODO: add code length (USE BYTES, NOT LENGTH) -->
-
   <p v-if="!isAdmin">Question {{ submission.questionNum }}</p>
   <p>
     <Correctness :correctness="submission.correctness" :showReason="true" />
@@ -16,7 +14,9 @@
     (opens in new tab/window)
   </p>
   <template v-if="submission.result">
-    <p v-if="!isAdmin">{{ submission.result.lang }}</p>
+    <p v-if="!isAdmin">
+      {{ submission.result.lang }}, {{ submission.result.codeBytes }} bytes
+    </p>
     <pre
       v-if="!isAdmin"
       style="margin-bottom: 2rem"
