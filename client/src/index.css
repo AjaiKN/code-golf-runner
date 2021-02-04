@@ -6,7 +6,7 @@
   display: none;
 }
 
-html {
+main {
   margin: 1rem 2rem;
 }
 
@@ -41,11 +41,18 @@ code {
   padding: 0;
 }
 
-#app {
+/* #app {
   margin-top: 5rem;
-}
+} */
 
 /* show that links open in new tab for accessibility */
 a[target='_blank']::after {
   content: '↗️';
+}
+
+html,
+body,
+app {
+  margin: 0;
+  padding: 0;
 }

@@ -12,28 +12,44 @@
   <!-- (adding "hack" class would make it markdown style) -->
   <body class="dark" style="font-size: 14px">
     <div
-      id="top-right"
-      style="position: absolute; top: 1rem; right: 1rem"
-    ></div>
-
-    <noscript>
-      <p>
-        Please enable JavaScript in your browser. We want to be able to give you
-        real time results.
-      </p>
-      <p>
-        If you really want to keep JavaScript off, you can use ask a test
-        administrator for the simple HTML URL.
-      </p>
-    </noscript>
-
-    <div id="app">
-      <p>Loading...</p>
-      <p>
-        Make sure to use an evergreen browser like Firefox, Chrome, Edge, Brave,
-        or Vivaldi. (Safari will probably work too.)
-      </p>
+      style="
+        position: sticky;
+        top: 0;
+        left: 0;
+        width: 100%;
+        /* background-color: black; */
+        background-color: rgba(0, 0, 0, 0.7);
+        /* opacity: 0.9; */
+      "
+    >
+      <div style="display: flex; justify-content: flex-end">
+        <div style="padding: 1rem 2rem; background-color: rgba(0, 0, 0, 1)">
+          <div id="top-right"></div>
+        </div>
+      </div>
     </div>
+
+    <main>
+      <div id="app">
+        <p>Loading...</p>
+        <p>
+          Make sure to use an evergreen browser like Firefox, Chrome, Edge,
+          Brave, or Vivaldi. (Safari will probably work too.)
+        </p>
+      </div>
+
+      <noscript>
+        <p>
+          Please enable JavaScript in your browser. We want to be able to give
+          you real time results.
+        </p>
+        <p>
+          If you really want to keep JavaScript off, you can use ask a test
+          administrator for the simple HTML URL.
+        </p>
+      </noscript>
+    </main>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
