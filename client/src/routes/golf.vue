@@ -20,6 +20,8 @@
       @logOut="logOut"
     />
   </div>
+
+  <div style="height: 70vh" />
 </template>
 
 <script lang="ts">
