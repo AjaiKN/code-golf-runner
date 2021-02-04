@@ -181,7 +181,7 @@ function scoreSubmissionsForQuestion(
     if (s1.correctness.correct && !s2.correctness.correct) return -1
     if (!s1.correctness.correct && s2.correctness.correct) return +1
     let ret = 0
-    if (s1.result?.code != null && s2.result?.code != null) {
+    if (s1.result?.codeBytes != null && s2.result?.codeBytes != null) {
       ret = s1.result.codeBytes - s2.result.codeBytes
     }
     if (ret !== 0) return ret

@@ -39,6 +39,7 @@ import type {
   AnnotatedSubmission,
   Globals,
   Ranking,
+  ScoredSubmission,
 } from '../../../server-src/types'
 import AdminQuestionStatusControl from '../components/AdminQuestionStatusControl.vue'
 import QuestionSelection from '../components/QuestionSelection.vue'
@@ -59,7 +60,7 @@ export default defineComponent({
   setup() {
     const error = ref()
 
-    const adminInfo = ref<{ submissions: AnnotatedSubmission[] }>()
+    const adminInfo = ref<{ submissions: ScoredSubmission[] }>()
 
     const globals = ref<Globals>()
 
@@ -85,7 +86,22 @@ export default defineComponent({
       () =>
         adminInfo.value?.submissions &&
         adminInfo.value.submissions
-          .reverse()
+          // copied from questions.ts
+          .sort((s1, s2) => {
+            if (s1.correctness.correct && !s2.correctness.correct) return -1
+            if (!s1.correctness.correct && s2.correctness.correct) return +1
+            if (!s1.isOutdated && s2.isOutdated) return -1
+            if (s1.isOutdated && !s2.isOutdated) return +1
+            let ret = 0
+            if (s1.result?.codeBytes != null && s2.result?.codeBytes != null) {
+              ret = s1.result.codeBytes - s2.result.codeBytes
+            }
+            if (ret !== 0) return ret
+            ret =
+              new Date(s2.timestamp).getTime() -
+              new Date(s1.timestamp).getTime()
+            return ret
+          })
           .filter((s) => s.questionNum === currentQuestionNum.value),
     )
 
