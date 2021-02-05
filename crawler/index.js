@@ -52,7 +52,7 @@ async function testTioRunCode(url, inputs) {
         await (
           await driver.findElement(By.css('label[for="toggle-input"]'))
         ).click()
-        await driver.wait(until.elementIsVisible(inputEl))
+        await driver.wait(until.elementIsVisible(inputEl), WAIT_TIME)
       }
       await inputEl.clear()
       await inputEl.sendKeys(input)
