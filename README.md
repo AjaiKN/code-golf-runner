@@ -42,7 +42,22 @@ This website is made up of 3 parts.
     2. To see the admin page, go to <http://localhost:5000/admin#mysecretpassword> (replace `mysecretpassword` with whatever you put in the `.env` files).
     3. If you change any of the code, it will rerun automatically.
 
+## Admin tools
+
 To run the admin textual tools (which allow you to do stuff like renaming players), run `yarn admin-tools`.
+
+## MongoDB backups
+
+```bash
+# go to the mongo-backup directory
+cd mongo-backup
+# back up the database into a folder named after the current date/time
+./backup.sh
+# back up the database once every 15 seconds (30 seconds is the default if you don't put a number)
+./backup-loop.sh
+# restore the backup with the specified folder name into the database (make sure to backup the current version database before doing this)
+./restore.sh 2022-02-01T12:34:56
+```
 
 ## Running in production
 
