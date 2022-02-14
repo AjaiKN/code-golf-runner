@@ -79,7 +79,7 @@ function isCorrect(
 }
 
 /** Annotate a submission by adding the correctness and marking which inputs/outputs are correct */
-function annotateSubmission(
+export function annotateSubmission(
   originalSubmission: Submission,
   questions: Question[],
 ): AnnotatedSubmission {

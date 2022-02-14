@@ -19,7 +19,7 @@ async function loop() {
     const questionNums = globals.questions
       .map((q) => q.questionNum)
       .sort((a, b) => a - b)
-    const { chosenNums } = prompts({
+    const { chosenNums } = await prompts({
       type: 'multiselect',
       name: 'chosenNums',
       message: 'Only these questionNums',
@@ -59,8 +59,9 @@ async function loop() {
           return
         }
       } else {
+        let res1
         try {
-          const res1 = await golfers.insertOne({ _id: newName, secretPhrase })
+          res1 = await golfers.insertOne({ _id: newName, secretPhrase })
         } catch (e) {
           console.error(e)
           console.log(`unable to insert. maybe use merge instead?`)
@@ -80,7 +81,7 @@ async function loop() {
         `submissions: ${res3.matchedCount} matched, ${res3.modifiedCount} modified`,
       )
     },
-    async 'delete results for submissions that failed to run'() {
+    async 'rescore results for submissions that failed to run'() {
       const res1 = await submissions.updateMany(
         { result: null, questionNum: { $in: await chooseQuestionNums() } },
         { $unset: { result: '' } },
@@ -88,8 +89,9 @@ async function loop() {
       console.log(
         `submissions: ${res1.matchedCount} matched, ${res1.modifiedCount} modified`,
       )
+      console.log(`You might need to restart the crawler`)
     },
-    async 'delete results for incorrect (or failed) submissions'() {
+    async 'rescore results for incorrect (or failed) submissions'() {
       const globals = await getGlobals()
       const allSubmissions = await submissions
         .find({ questionNum: { $in: await chooseQuestionNums() } })
@@ -98,7 +100,7 @@ async function loop() {
         annotateSubmission(s, globals.questions),
       )
       const incorrectIds = annotatedSubmissions
-        .filter((s) => s.correctness.correct)
+        .filter((s) => !s.correctness.correct)
         .map((s) => s._id)
       const res1 = await submissions.updateMany(
         { _id: { $in: incorrectIds } },
@@ -107,8 +109,9 @@ async function loop() {
       console.log(
         `submissions: ${res1.matchedCount} matched, ${res1.modifiedCount} modified`,
       )
+      console.log(`You might need to restart the crawler`)
     },
-    async 'delete all results'() {
+    async 'rescore all results'() {
       const res1 = await submissions.updateMany(
         { questionNum: { $in: await chooseQuestionNums() } },
         { $unset: { result: '' } },
@@ -116,6 +119,7 @@ async function loop() {
       console.log(
         `submissions: ${res1.matchedCount} matched, ${res1.modifiedCount} modified`,
       )
+      console.log(`You might need to restart the crawler`)
     },
     async 'override correctness'() {
       const { ids, overrideIsCorrect } = prompts([
@@ -142,6 +146,17 @@ async function loop() {
     async 'generate secret phrase'() {
       console.log(await require('./server-src/diceware').genSecretPhrase())
     },
+    async 'DANGER: delete all submissions'() {
+      const shouldDelete = await prompts({
+        type: 'confirm',
+        name: 'value',
+        message: 'Are you sure?',
+      })
+      if (shouldDelete.value) {
+        const res1 = await submissions.deleteMany({})
+        console.log(`submissions: ${res1.deletedCount} deleted`)
+      }
+    },
   }
 
   const choices = Object.entries(commands).map(([title, value]) => ({
@@ -166,15 +181,7 @@ async function loop() {
   if (theResult.command === 'quit') return
   await theResult.command()
 
-  const { shouldContinue } = await prompts({
-    type: 'toggle',
-    name: 'shouldContinue',
-    message: 'quit or continue?',
-    inactive: 'quit',
-    active: 'continue',
-  })
-
-  if (shouldContinue) await loop()
+  await loop()
 }
 
 client
