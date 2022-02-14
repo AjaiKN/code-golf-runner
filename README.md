@@ -55,6 +55,8 @@ cd mongo-backup
 ./backup.sh
 # back up the database once every 15 seconds (30 seconds is the default if you don't put a number)
 ./backup-loop.sh
+# show the list of backups that have been made
+ls
 # restore the backup with the specified folder name into the database (make sure to backup the current version database before doing this)
 ./restore.sh 2022-02-01T12:34:56
 ```
