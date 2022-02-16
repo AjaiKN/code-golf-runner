@@ -111,5 +111,8 @@ export function useWebsocket(
     }
   }, 4000)
 
+  // https://devcenter.heroku.com/articles/websockets#timeouts
+  setInterval(() => send({ type: 'ping' }), 20000)
+
   return { isConnected, send }
 }

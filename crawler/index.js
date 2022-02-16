@@ -169,6 +169,12 @@ function connectWebsocket() {
   socket.on('close', disconnected)
   socket.on('error', disconnected)
 
+  // https://devcenter.heroku.com/articles/websockets#timeouts
+  setInterval(() => {
+    if (socket?.readyState === 1) socket.send(JSON.stringify({ type: 'ping' }))
+    else console.log('Cannot ping, socket not open')
+  }, 20000)
+
   socket.on('message', async (dataUnparsed) => {
     const data = destr(dataUnparsed.toString())
     if (data.type === 'update') {
