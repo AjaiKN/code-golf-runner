@@ -33,7 +33,7 @@ function isCorrect(
   if (overrideIsCorrect != null)
     return {
       correct: submission.overrideIsCorrect,
-      reason: 'overriden by admin',
+      reason: 'overridden by admin',
     }
 
   if (isLate) return { correct: false, reason: 'submitted late' }
