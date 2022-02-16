@@ -133,14 +133,28 @@ async function loop() {
           type: 'toggle',
           message: 'new correctness?',
           inactive: 'incorrect',
-          inactive: 'correct',
+          active: 'correct',
           initial: true,
         },
       ])
       const objectIds = ids.map((id) => ObjectId(id))
       await submissions.updateMany(
         { _id: { $in: [ids, ...objectIds] } },
-        { overrideIsCorrect },
+        { $set: { overrideIsCorrect } },
+      )
+    },
+    async 'unoverride correctness'() {
+      const { ids } = await prompts([
+        {
+          name: 'ids',
+          type: 'list',
+          message: '_ids? (separate with commas)',
+        },
+      ])
+      const objectIds = ids.map((id) => ObjectId(id))
+      await submissions.updateMany(
+        { _id: { $in: [ids, ...objectIds] } },
+        { $unset: { overrideIsCorrect: '' } },
       )
     },
     async 'generate secret phrase'() {
