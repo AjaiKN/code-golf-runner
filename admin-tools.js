@@ -160,7 +160,7 @@ async function loop() {
     async 'generate secret phrase'() {
       console.log(await require('./server-src/diceware').genSecretPhrase())
     },
-    async 'DANGER: delete all submissions'() {
+    async 'DANGER: delete all submissions for all questions'() {
       const shouldDelete = await prompts({
         type: 'confirm',
         name: 'value',
