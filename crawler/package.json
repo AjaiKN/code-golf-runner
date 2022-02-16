@@ -3,6 +3,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon --unhandled-rejections=strict index.js",
     "devprod": "cross-env NODE_ENV=production nodemon --unhandled-rejections=strict index.js",
+    "prod": "yarn start",
     "start": "cross-env NODE_ENV=production node --unhandled-rejections=strict index.js"
   },
   "dependencies": {
