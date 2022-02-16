@@ -9,13 +9,22 @@
     />
   </div>
 
-  <div style="display: flex; align-items: center">
+  <div
+    style="display: flex; align-items: center"
+    v-if="currentQuestionNum != null"
+  >
     <span>Question:&nbsp;</span>
     <QuestionSelection
       v-if="currentQuestionNum != null"
       v-model:currentQuestionNum="currentQuestionNum"
       :questionNums="questionNums"
     />
+
+    <button style="margin-left: 1rem" @click="changeQuestionNumber">
+      Change this question's number
+    </button>
+    <button @click="removeQuestion">Remove this question</button>
+    <button @click="addQuestion">Add a question</button>
   </div>
 
   <AdminQuestionsEdit
@@ -55,6 +64,9 @@ import Rankings from '../components/Rankings.vue'
 import { useWebsocket } from '../http'
 import { useCurrentQuestionNum } from '../useCurrentQuestionNum'
 import AdminQuestionsEdit from '../components/AdminQuestionsEdit.vue'
+
+import produce, { setAutoFreeze } from 'immer'
+setAutoFreeze(false)
 
 export default defineComponent({
   components: {
@@ -113,21 +125,84 @@ export default defineComponent({
           .filter((s) => s.questionNum === currentQuestionNum.value),
     )
 
+    const globalsProxy = computed({
+      get: () => globals.value,
+      set: (newGlobals) => {
+        globals.value = globals.value
+        send({ type: 'update:globals', globals: newGlobals })
+      },
+    })
+
+    function changeQuestionNumber() {
+      const newQuestionNum = prompt('Enter the new question number')
+      if (newQuestionNum == null) return
+      const newQuestionNumInt = parseInt(newQuestionNum)
+      if (isNaN(newQuestionNumInt)) {
+        alert('Invalid question number')
+        return
+      }
+      if (questionNums.value?.includes(newQuestionNumInt)) {
+        alert('Question number already exists')
+        return
+      }
+      const newGlobals = produce(globals.value, (draft) => {
+        if (draft == null) return
+        const question = draft.questions.find(
+          (q) => q.questionNum === currentQuestionNum.value,
+        )
+        if (question == null) return
+        question.questionNum = newQuestionNumInt
+
+        draft.questions = draft.questions.sort(
+          (q1, q2) => q1.questionNum - q2.questionNum,
+        )
+      })
+      globalsProxy.value = newGlobals
+    }
+
+    function removeQuestion() {
+      if (!confirm('Are you sure you want to remove this question?')) return
+      const newGlobals = produce(globals.value, (draft) => {
+        if (draft == null) return
+        const questionIndex = draft.questions.findIndex(
+          (q) => q.questionNum === currentQuestionNum.value,
+        )
+        draft.questions.splice(questionIndex, 1)
+      })
+      globalsProxy.value = newGlobals
+    }
+
+    function addQuestion() {
+      const newGlobals = produce(globals.value, (draft) => {
+        if (draft == null) return
+        draft.questions.push({
+          questionNum: questionNums.value?.length
+            ? Math.max(...questionNums.value) + 1
+            : 1,
+          inputsOutputs: [{ isGivenExample: true, input: '', output: '' }],
+          status: 'notStarted',
+          text: '',
+        })
+
+        draft.questions = draft.questions.sort(
+          (q1, q2) => q1.questionNum - q2.questionNum,
+        )
+      })
+      globalsProxy.value = newGlobals
+    }
+
     return {
       adminInfo,
       submissions: computed(() => adminInfo.value?.submissions),
       error,
       isConnected,
-      globals: computed({
-        get: () => globals.value,
-        set: (newGlobals) => {
-          globals.value = globals.value
-          send({ type: 'update:globals', globals: newGlobals })
-        },
-      }),
+      globals: globalsProxy,
       questionNums,
       currentQuestionNum,
       filteredSubmissions,
+      changeQuestionNumber,
+      removeQuestion,
+      addQuestion,
     }
   },
 })
