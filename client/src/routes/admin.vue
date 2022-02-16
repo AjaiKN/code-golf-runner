@@ -39,7 +39,12 @@
 
   <div v-else>
     <h1 style="margin-bottom: 0.4rem">Code Golf Results</h1>
-    <p>Click on a row to view more details.</p>
+    <p>
+      Click on a row to view more details.
+      <button @click="deleteAllSubmissions">
+        Delete all submissions for all questions
+      </button>
+    </p>
 
     <SubmissionAdmin :submissions="filteredSubmissions" />
   </div>
@@ -191,6 +196,17 @@ export default defineComponent({
       globalsProxy.value = newGlobals
     }
 
+    function deleteAllSubmissions() {
+      if (
+        !window.confirm(
+          'Woah! Are you sure you want to delete every submission for every question?',
+        )
+      )
+        return
+
+      send({ type: 'deleteAllSubmissions' })
+    }
+
     return {
       adminInfo,
       submissions: computed(() => adminInfo.value?.submissions),
@@ -203,6 +219,7 @@ export default defineComponent({
       changeQuestionNumber,
       removeQuestion,
       addQuestion,
+      deleteAllSubmissions,
     }
   },
 })

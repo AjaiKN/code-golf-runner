@@ -56,6 +56,8 @@ module.exports = async function admin(server) {
         return
       } else if (message.type === 'update:globals') {
         await globals.replaceOne({}, message.globals)
+      } else if (message.type === 'deleteAllSubmissions') {
+        await submissions.deleteMany({})
       }
     })
 
