@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import destr from 'destr'
 
 let SERVER_URL = (import.meta.env.VITE_SERVER_URL ??
   'http://localhost:3000') as string
@@ -94,7 +95,7 @@ export function useWebsocket(
       if (onConnect) onConnect()
     })
     ws.addEventListener('message', (event) => {
-      const { type, ...message } = JSON.parse(event.data)
+      const { type, ...message } = destr(event.data)
       console.log({ type, ...message })
       if (onMessage && onMessage[type]) onMessage[type](message)
     })

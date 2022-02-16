@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "cross-env": "^7.0.3",
+    "destr": "^1.1.0",
     "dotenv": "^8.2.0",
     "lodash": "^4.17.20",
     "nodemon": "^2.0.6",

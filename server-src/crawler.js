@@ -1,6 +1,7 @@
 const { ObjectId } = require('mongodb')
 const { limitRate } = require('./auth-rate-limit')
 const { normalizeInput } = require('./questions')
+const destr = require('destr')
 
 /** @type {import('fastify').FastifyPluginAsync<{}>} */
 module.exports = async function crawler(server) {
@@ -47,7 +48,7 @@ module.exports = async function crawler(server) {
     sendData()
 
     connection.socket.on('message', async (messageUnparsed) => {
-      const { type, ...message } = JSON.parse(messageUnparsed)
+      const { type, ...message } = destr(messageUnparsed)
       if (type === 'testresult') {
         const { _id, result } = message
         submissions.updateOne({ _id: new ObjectId(_id) }, { $set: { result } })

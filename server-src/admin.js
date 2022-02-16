@@ -1,5 +1,6 @@
 const { limitRate } = require('./auth-rate-limit')
 const { score, getPeopleRankings } = require('./questions')
+const destr = require('destr')
 
 /** @type {import('fastify').FastifyPluginAsync<{}>} */
 module.exports = async function admin(server) {
@@ -42,7 +43,7 @@ module.exports = async function admin(server) {
     }
 
     connection.socket.on('message', async (messageUnparsed) => {
-      const message = JSON.parse(messageUnparsed)
+      const message = destr(messageUnparsed)
       if (message.type === 'auth') {
         await limitRate()
         if (message.password === process.env.PASSWORD) {

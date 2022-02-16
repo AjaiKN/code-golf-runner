@@ -3,6 +3,7 @@ const { genSecretPhrase } = require('./diceware.js')
 const { limitRate } = require('./auth-rate-limit.js')
 const { censorGlobals, score } = require('./questions')
 const querystring = require('querystring')
+const destr = require('destr')
 const { produce, setAutoFreeze } = require('immer')
 setAutoFreeze(false)
 
@@ -81,7 +82,7 @@ module.exports = async function golfer(server) {
     }
 
     connection.socket.on('message', async (messageUnparsed) => {
-      const message = JSON.parse(messageUnparsed)
+      const message = destr(messageUnparsed)
       if (message.type === 'auth') {
         message.name = message.name.trim()
         if (message.name === '') {

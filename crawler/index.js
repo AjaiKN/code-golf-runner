@@ -3,6 +3,7 @@
 const _ = require('lodash')
 const { Builder, By, until } = require('selenium-webdriver')
 const chrome = require('selenium-webdriver/chrome')
+const destr = require('destr')
 
 const WAIT_TIME = 10000
 
@@ -169,7 +170,7 @@ function connectWebsocket() {
   socket.on('error', disconnected)
 
   socket.on('message', async (dataUnparsed) => {
-    const data = JSON.parse(dataUnparsed.toString())
+    const data = destr(dataUnparsed.toString())
     if (data.type === 'update') {
       const receivedSubmissions = data.submissions
       console.log('received')
