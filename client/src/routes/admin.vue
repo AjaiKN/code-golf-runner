@@ -18,6 +18,12 @@
     />
   </div>
 
+  <AdminQuestionsEdit
+    v-if="globals && currentQuestionNum != null"
+    v-model:globals="globals"
+    :currentQuestionNum="currentQuestionNum"
+  />
+
   <pre v-if="error">{{ error }}</pre>
 
   <p v-else-if="!adminInfo">Loading...</p>
@@ -48,6 +54,7 @@ import SubmissionAdmin from '../components/SubmissionAdmin.vue'
 import Rankings from '../components/Rankings.vue'
 import { useWebsocket } from '../http'
 import { useCurrentQuestionNum } from '../useCurrentQuestionNum'
+import AdminQuestionsEdit from '../components/AdminQuestionsEdit.vue'
 
 export default defineComponent({
   components: {
@@ -56,6 +63,7 @@ export default defineComponent({
     AdminQuestionStatusControl,
     QuestionSelection,
     Rankings,
+    AdminQuestionsEdit,
   },
   setup() {
     const error = ref()
