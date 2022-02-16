@@ -122,7 +122,7 @@ async function loop() {
       console.log(`You might need to restart the crawler`)
     },
     async 'override correctness'() {
-      const { ids, overrideIsCorrect } = prompts([
+      const { ids, overrideIsCorrect } = await prompts([
         {
           name: 'ids',
           type: 'list',
