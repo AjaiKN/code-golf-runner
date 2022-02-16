@@ -6,7 +6,7 @@
   },
   "scripts": {
     "dev": "ts-node-dev --transpile-only server-src/index.js",
-    "build": "esbuild server-src/index.js --outdir=dist",
+    "build": "esbuild server-src/*.ts server-src/*.js --outdir=dist --format=cjs",
     "start": "node dist/index.js",
     "admin-tools": "ts-node --transpile-only ./admin-tools.js",
     "test": "jest"

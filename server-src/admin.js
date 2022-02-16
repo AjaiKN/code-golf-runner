@@ -69,5 +69,3 @@ module.exports = async function admin(server) {
     })
   })
 }
-
-export {}
