@@ -3,6 +3,9 @@
   <p>
     <Correctness :correctness="submission.correctness" :showReason="true" />
   </p>
+  <p v-if="isAdmin">
+    {{ submission._id }}
+  </p>
   <p>
     {{ getHumanTime(submission.timestamp) }}
     <span v-if="submission.isLate" style="color: red">(Late)</span>
