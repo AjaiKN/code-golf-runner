@@ -6,7 +6,7 @@
   },
   "scripts": {
     "dev": "ts-node-dev --transpile-only server-src/index.js",
-    "build": "tsc --noEmit false",
+    "build": "esbuild server-src/index.js --outdir=dist",
     "start": "node dist/index.js",
     "admin-tools": "ts-node --transpile-only ./admin-tools.js",
     "test": "jest"
@@ -39,6 +39,7 @@
     "@types/mongodb": "^3.6.3",
     "@types/node": "^14.14.14",
     "babel-jest": "^26.6.3",
+    "esbuild": "^0.14.21",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
     "prompts": "^2.4.0",
