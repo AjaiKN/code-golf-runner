@@ -50,6 +50,11 @@ async function testTioRunCode(url, inputs) {
       // input
       const inputEl = await driver.findElement(By.id('input'))
       if (!(await inputEl.isDisplayed())) {
+        const labelEl = await driver.findElement(
+          By.css('label[for="toggle-input"]'),
+        )
+        await driver.wait(until.elementIsVisible(labelEl), WAIT_TIME)
+        await driver.wait(until.elementIsEnabled(labelEl), WAIT_TIME)
         await (
           await driver.findElement(By.css('label[for="toggle-input"]'))
         ).click()
