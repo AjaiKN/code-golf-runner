@@ -12,7 +12,7 @@
     "dotenv": "^8.2.0",
     "lodash": "^4.17.20",
     "nodemon": "^2.0.6",
-    "selenium-webdriver": "^4.1.1",
+    "selenium-webdriver": "^4.0.0-alpha.8",
     "ws": "^7.4.1"
   },
   "devDependencies": {
