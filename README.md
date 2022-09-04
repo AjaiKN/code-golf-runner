@@ -2,6 +2,8 @@
 
 A website for running the TechOlympics 2021 code golf competition. Golfers submit their answers as links to code on `https://tio.run/`. Admins can create questions and choose when to show each question, as well as when to stop accepting responses. When someone submits a link, the "crawler," which you can run on your local computer, uses Selenium to visit the link in a headless Chrome instance and input test cases.
 
+NOTE: The crawler seems to be unreliable lately, so have a backup plan if you want to use this.
+
 ## Basic Structure
 
 This website is made up of 3 parts.
